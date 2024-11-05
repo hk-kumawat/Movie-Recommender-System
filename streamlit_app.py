@@ -7,15 +7,7 @@ import requests
 import zipfile
 from io import BytesIO
 import time
-import warnings
-warnings.filterwarnings("ignore", category=UserWarning, module='sklearn')
 
-
-# Download and unzip MovieLens 1M dataset
-url = "http://files.grouplens.org/datasets/movielens/ml-1m.zip"
-response = requests.get(url)
-with zipfile.ZipFile(BytesIO(response.content)) as z:
-    z.extractall("Dataset")
 
 # Load the data files
 movies = pd.read_csv('Dataset/ml-1m/movies.dat', sep='::', names=['movie_id', 'title', 'genres'], engine='python', encoding='latin-1')
