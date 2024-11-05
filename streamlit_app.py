@@ -6,7 +6,10 @@ from sklearn.feature_extraction.text import CountVectorizer
 import requests
 import zipfile
 from io import BytesIO
-import time  # For adding delay effects
+import time
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning, module='sklearn')
+
 
 # Download and unzip MovieLens 1M dataset
 url = "http://files.grouplens.org/datasets/movielens/ml-1m.zip"
