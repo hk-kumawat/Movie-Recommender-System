@@ -20,7 +20,7 @@ movie_ratings = pd.merge(ratings, movies, on='movie_id')
 user_movie_matrix = movie_ratings.pivot_table(index='user_id', columns='title', values='rating').fillna(0)
 
 # Genre-based matrix
-count_vectorizer = CountVectorizer(tokenizer=lambda x: x.split('|'))
+count_vectorizer = CountVectorizer(tokenizer=lambda x: x.split('|'), token_pattern=None)
 genre_matrix = count_vectorizer.fit_transform(movies['genres'])
 genre_sim_matrix = cosine_similarity(genre_matrix)
 genre_sim_df = pd.DataFrame(genre_sim_matrix, index=movies['title'], columns=movies['title'])
