@@ -1,6 +1,5 @@
-streamlit
-pandas
-numpy
-scikit-learn
-requests
-time
+streamlit==1.32.0
+pandas==2.2.3
+numpy==1.26.4
+scikit-learn==1.5.2
+requests==2.31.0
