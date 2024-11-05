@@ -1,7 +1,6 @@
+streamlit
 pandas
 numpy
-matplotlib
-seaborn
 scikit-learn
-streamlit
 requests
+time

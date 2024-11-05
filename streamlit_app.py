@@ -64,9 +64,7 @@ def recommend_movies(movie_title, num_recommendations=5):
 
     recommendations = pd.DataFrame({
         'Rank': range(1, len(recommended_movies) + 1),
-        'Recommended Movie': recommended_movies.index,
-        'Similarity Score': recommended_movies.values
-    })
+        'Recommended Movie': recommended_movies.index    })
 
     return recommendations
 
