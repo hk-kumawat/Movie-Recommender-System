@@ -122,10 +122,13 @@ if st.button("Give Me the Best Movies!🎬"):
             st.markdown(f"<p style='text-align: center;'>{movie_names[i]}</p>", unsafe_allow_html=True)
 
 # Footer section
-st.markdown("---")  # Horizontal divider
-st.markdown(
-    "<div style='text-align: center; color: #7f8c8d; font-size: 16px;'>"
-    "🍿 | Brought to Life By - Harshal Kumawat | 🎬"
-    "</div>",
-    unsafe_allow_html=True
-)
+with st.container():
+    st.markdown("---")  # Horizontal divider
+    st.markdown(
+        "<div style='text-align: center; color: #7f8c8d; font-size: 16px;'>"
+        "🍿 | Brought to Life By - Harshal Kumawat | 🎬"
+        "</div>",
+        unsafe_allow_html=True
+    )
+
+st.markdown('<div class="footer">🤖 Brought to Life by - Harshal Kumawat 🧑🏻‍💻</div>', unsafe_allow_html=True)
