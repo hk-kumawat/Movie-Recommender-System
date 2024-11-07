@@ -129,5 +129,4 @@ if st.button("Give Me the Best Movies!🎬"):
         "</div>",
         unsafe_allow_html=True
     )
-
-st.markdown('<div class="footer">🤖 Brought to Life by - Harshal Kumawat 🧑🏻‍💻</div>', unsafe_allow_html=True)
+    
