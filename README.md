@@ -1,9 +1,4 @@
-Here’s a structured README file based on your Movie Recommender System project:
-
----
-
 # 🎬 Movie Recommender System 📽️  
-Created By - Harshal Kumawat
 
 ## Overview
 
