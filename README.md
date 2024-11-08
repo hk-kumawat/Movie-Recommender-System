@@ -86,7 +86,7 @@ _Below is a preview of the Movie Recommender System in action. Enter a movie nam
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/hk-kumawat/Movie-Recommender-System.git
+   https://github.com/hk-kumawat/Movie-Recommender-System.git
    ```
 
 2. **Install dependencies**:
