@@ -1,0 +1,137 @@
+Here’s a structured README file based on your Movie Recommender System project:
+
+---
+
+# 🎬 Movie Recommender System 📽️  
+Created By - Harshal Kumawat
+
+## Overview
+
+The Movie Recommender System leverages machine learning and natural language processing to suggest movies similar to a user’s selected movie. Using metadata from movies such as genres, keywords, cast, and crew, it provides recommendations based on similarity. This project is ideal for applications like personalized streaming services and movie discovery platforms.
+
+Try the live app here 👉🏻 [![Explore Now 🌟](https://img.shields.io/badge/Explore%20Now%20!-blue)](https://yourapp.streamlit.app/)
+
+<br>
+
+## Table of Contents
+
+1. [Features](#features)
+2. [Dataset](#dataset)
+3. [Data Preprocessing](#data-preprocessing)
+4. [Model Training](#model-training)
+5. [Installation](#installation)
+6. [Usage](#usage)
+7. [Technologies Used](#technologies-used)
+8. [Results](#results)
+9. [Conclusion](#conclusion)
+10. [Contact](#contact)
+
+<br>
+
+## Features🌟
+
+- Real-time movie recommendations based on a user-selected movie.
+- Integrates with The Movie Database (TMDb) API to fetch trending movies and posters.
+- Provides an intuitive interface built with Streamlit for an engaging user experience.
+- Robust handling of network errors to ensure smooth API interactions.
+
+<br>
+
+## Dataset 📊
+
+- **TMDb 5000 Movie Dataset**: This dataset contains metadata for 5,000 movies, including details like genres, cast, and crew.
+- **Data Splits**: The data is processed into a similarity matrix, which is used to find movies similar to the user’s selected movie.
+
+<br>
+
+## Data Preprocessing 🛠
+
+1. **Data Cleaning**: Null values are removed, and duplicate entries are handled.
+2. **Feature Extraction**: The following features are extracted for each movie:
+   - **Genres**
+   - **Keywords**
+   - **Cast** (top 3 cast members)
+   - **Crew** (director only)
+3. **Text Preprocessing**: Features are merged into a single "tags" column and converted to lowercase.
+4. **Stemming**: PorterStemmer is used to reduce words to their root forms, optimizing similarity matching.
+
+<br>
+
+## Model Training 🧠
+
+- **Text Vectorization**: A `CountVectorizer` is used to transform text data into vectors, with a maximum of 5,000 features.
+- **Cosine Similarity**: Cosine similarity is computed to create a similarity matrix, measuring the closeness of each movie pair.
+- **Similarity Search**: The model retrieves the top 5 most similar movies for the selected title.
+
+### Final Model Artifacts:
+- `movie_list.pkl`: Contains movie data for the recommendation.
+- `similarity.pkl`: Stores the cosine similarity matrix for recommendations.
+
+<br>
+
+## Installation 🛠
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/hk-kumawat/Movie-Recommender-System.git
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+<br>
+
+## Usage 🚀
+
+1. **Run the Streamlit App**:
+   ```bash
+   streamlit run app.py
+   ```
+
+2. **Selecting a Movie**: Choose a movie from the dropdown menu to view recommendations.
+3. **Trending Section**: The app also displays the top 5 trending movies based on TMDb’s API.
+
+<br>
+
+## Technologies Used 💻
+
+- **Programming Language**: Python
+- **Libraries**:
+  - `pandas`
+  - `numpy`
+  - `scikit-learn`
+  - `streamlit`
+  - `requests`
+  - `nltk` (for stemming)
+- **API**: TMDb API for fetching trending movies and movie posters
+
+<br>
+
+## Results 🏆
+
+The Movie Recommender System effectively recommends movies with similar features, with quick response times and a user-friendly interface. The project showcases how machine learning and NLP can be applied to content-based recommendation systems.
+
+<br>
+
+## Conclusion 📚
+
+This Movie Recommender System demonstrates the capability of machine learning and NLP in recommendation tasks. By leveraging metadata from movies and cosine similarity, the system provides meaningful and contextually relevant movie suggestions, adding value for users seeking personalized recommendations.
+
+<br>
+
+## Contact
+
+### 📬 Get in Touch!
+I’d love to connect and discuss further:
+
+- [![GitHub](https://img.shields.io/badge/GitHub-hk--kumawat-blue?logo=github)](https://github.com/hk-kumawat) 💻 — Explore my projects and contributions.
+- [![LinkedIn](https://img.shields.io/badge/LinkedIn-Harshal%20Kumawat-blue?logo=linkedin)](https://www.linkedin.com/in/harshal-kumawat/) 🌐 — Let’s connect professionally.
+- [![Email](https://img.shields.io/badge/Email-harshalkumawat100@gmail.com-blue?logo=gmail)](mailto:harshalkumawat100@gmail.com) 📧 — Send me an email for discussions.
+
+<br>
+
+---
+
+> "Discovering your next favorite movie with AI."
