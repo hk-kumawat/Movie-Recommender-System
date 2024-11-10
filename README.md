@@ -35,7 +35,8 @@ _Below is a preview of the Movie Recommender System in action. Enter a movie nam
 7. [Technologies Used](#technologies-used)
 8. [Results](#results)
 9. [Conclusion](#conclusion)
-10. [Contact](#contact)
+10. [License](#license)
+11. [Contact](#contact)
 
 <br>
 
@@ -135,6 +136,12 @@ The **Movie Recommender System** showcases how **machine learning** can enhance 
 
 With room for further enhancements, such as refining the recommendation logic or expanding the dataset, this system provides a solid foundation for **personalized, data-driven movie suggestions**. It serves as a practical application of **machine learning concepts** and highlights the role of **content-based filtering** in building engaging and user-centric platforms.
 
+
+<br> 
+
+## License📝
+
+This project is licensed under the **MIT License** - see the [LICENSE](./LICENSE) file for details.
 
 <br>
 
