@@ -4,6 +4,9 @@ import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
+# Retrieve the API key from Streamlit secrets
+TMDB_API_KEY = st.secrets["tmdb"]["api_key"]
+
 # Function to create a session with a retry strategy
 def requests_retry_session(
     retries=5,
@@ -26,12 +29,18 @@ def requests_retry_session(
 
 # Function to fetch trending movies with error handling
 def fetch_trending():
-    url = "https://api.themoviedb.org/3/trending/movie/week?api_key=dbc0290c96815e2aaacf35f5014b1401"
+    url = f"https://api.themoviedb.org/3/trending/movie/week?api_key={TMDB_API_KEY}"
     try:
         response = requests_retry_session().get(url)
         response.raise_for_status()
         data = response.json()
-        trending = [{"title": item["title"], "poster": "https://image.tmdb.org/t/p/w500/" + item["poster_path"]} for item in data["results"][:5]]
+        trending = [
+            {
+                "title": item["title"],
+                "poster": "https://image.tmdb.org/t/p/w500/" + item["poster_path"]
+            }
+            for item in data["results"][:5]
+        ]
         return trending
     except requests.exceptions.RequestException:
         st.error("Unable to fetch trending movies at the moment. Please try again later.")
@@ -40,7 +49,7 @@ def fetch_trending():
 # Function to fetch posters for recommendations with retry and error handling
 def fetch_poster(movie_id):
     try:
-        url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key=dbc0290c96815e2aaacf35f5014b1401&language=en-US"
+        url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}&language=en-US"
         response = requests_retry_session().get(url)
         if response.status_code == 200:
             data = response.json()
