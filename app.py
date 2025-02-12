@@ -5,10 +5,8 @@ from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
 # ------------------------------
-# Initialization of Session State
+# Session State Initialization
 # ------------------------------
-if "favorites" not in st.session_state:
-    st.session_state.favorites = []  # Stores movie_id of favorite movies
 if "history" not in st.session_state:
     st.session_state.history = []    # Stores movie_id of recently viewed movies
 if "mode" not in st.session_state:
@@ -88,10 +86,10 @@ def get_movie_details(movie_id):
                     "character": actor.get("character"),
                     "profile": f"https://image.tmdb.org/t/p/w500{actor['profile_path']}" if actor.get("profile_path") else None
                 })
-            # Additional details: genres, budget, revenue
             genres = ", ".join([g["name"] for g in data.get("genres", [])]) if data.get("genres") else "N/A"
-            budget = f"${data.get('budget', 0):,}" if data.get('budget', 0) > 0 else "N/A"
-            revenue = f"${data.get('revenue', 0):,}" if data.get('revenue', 0) > 0 else "N/A"
+            budget = f"${data.get('budget', 0):,}" if data.get("budget", 0) > 0 else "N/A"
+            revenue = f"${data.get('revenue', 0):,}" if data.get("revenue", 0) > 0 else "N/A"
+            available_in = ", ".join([lang["english_name"] for lang in data.get("spoken_languages", [])]) if data.get("spoken_languages") else "N/A"
             return {
                 "rating": data.get("vote_average"),
                 "vote_count": data.get("vote_count"),
@@ -103,7 +101,8 @@ def get_movie_details(movie_id):
                 "cast": cast_details,
                 "genres": genres,
                 "budget": budget,
-                "revenue": revenue
+                "revenue": revenue,
+                "available_in": available_in,
             }
     except Exception as e:
         print(e)
@@ -134,6 +133,13 @@ def get_random_movie():
         "movie_id": random_movie["movie_id"]
     }
 
+def update_history(movie_id):
+    # Add the movie to recently viewed if it's not the same as the last viewed
+    if not st.session_state.history or st.session_state.history[-1] != movie_id:
+        st.session_state.history.append(movie_id)
+        if len(st.session_state.history) > 5:
+            st.session_state.history.pop(0)
+
 # ------------------------------
 # Load Data
 # ------------------------------
@@ -145,48 +151,14 @@ similarity = pickle.load(open("model_files/similarity.pkl", "rb"))
 # ------------------------------
 st.set_page_config(page_title="Movie Recommender", layout="wide")
 st.markdown("""
-    <h1 style='text-align: center; color: #FF4B4B; padding: 10px 0 0 0;'>
+    <h1 style='text-align: center; color: #FF4B4B; margin-bottom: 0.5em;'>
         🍿 Movie Magic Recommender
     </h1>
-    <p style='text-align: center; color: #555; font-size: 1.2rem;'>
+    <p style='text-align: center; color: #555; font-size: 1.2rem; margin-top: 0;'>
         Discover your next favorite movie! 🎬
     </p>
     <hr style="border:1px solid #eee">
 """, unsafe_allow_html=True)
-
-# ------------------------------
-# Sidebar: Favorites & Recently Viewed
-# ------------------------------
-with st.sidebar:
-    st.header("⭐ My Favorites")
-    if st.session_state.favorites:
-        for fav_id in st.session_state.favorites:
-            movie_row = movies[movies["movie_id"] == fav_id].iloc[0]
-            fav_title = movie_row["title"]
-            fav_poster = fetch_poster(fav_id)
-            if fav_poster:
-                st.image(fav_poster, width=100)
-            # Clicking the button loads the favorite movie
-            if st.button(fav_title, key=f"fav_button_{fav_id}"):
-                st.session_state.mode = "search"
-                st.session_state.selected_movie = fav_title
-    else:
-        st.write("No favorites yet.")
-
-    st.header("🕒 Recently Viewed")
-    if st.session_state.history:
-        # Show most recent first
-        for hist_id in reversed(st.session_state.history):
-            movie_row = movies[movies["movie_id"] == hist_id].iloc[0]
-            hist_title = movie_row["title"]
-            hist_poster = fetch_poster(hist_id)
-            if hist_poster:
-                st.image(hist_poster, width=100)
-            if st.button(hist_title, key=f"hist_button_{hist_id}"):
-                st.session_state.mode = "search"
-                st.session_state.selected_movie = hist_title
-    else:
-        st.write("No history yet.")
 
 # ------------------------------
 # Main Selection Section
@@ -211,13 +183,6 @@ st.markdown("<br>", unsafe_allow_html=True)
 # ------------------------------
 # Content Section: Movie Details & Recommendations
 # ------------------------------
-def update_history(movie_id):
-    # Add the movie to recently viewed if not the same as the last viewed
-    if not st.session_state.history or st.session_state.history[-1] != movie_id:
-        st.session_state.history.append(movie_id)
-        if len(st.session_state.history) > 5:
-            st.session_state.history.pop(0)
-
 if "mode" in st.session_state and st.session_state.mode:
     if st.session_state.mode == "search":
         movie_title = st.session_state.selected_movie
@@ -230,36 +195,33 @@ if "mode" in st.session_state and st.session_state.mode:
         st.markdown("<hr>", unsafe_allow_html=True)
         st.subheader(f"🎬 Details for: {movie_title}")
 
-        # Display Movie Details
+        # Display poster and details side-by-side
         detail_col_left, detail_col_right = st.columns([1, 2])
         with detail_col_left:
             poster = fetch_poster(movie_id)
             if poster:
                 st.image(poster, use_column_width=True)
         with detail_col_right:
-            st.markdown(f"**Release Date:** {details['release_date'] or 'N/A'}")
-            st.markdown(f"**Rating:** {details['rating']} / 10 ({details['vote_count']} votes)" if details["rating"] else "**Rating:** N/A")
-            # Visual rating progress bar (scaled to 100)
-            if details["rating"]:
-                st.progress(int(details["rating"] * 10))
-            st.markdown(f"**Runtime:** {details['runtime']} mins" if details["runtime"] else "**Runtime:** N/A")
-            st.markdown(f"**Director:** {details['director'] or 'N/A'}")
-            st.markdown(f"**Genres:** {details['genres']}")
-            st.markdown(f"**Budget:** {details['budget']} &nbsp;&nbsp; **Revenue:** {details['revenue']}")
+            st.markdown("### Movie Details")
+            st.markdown(f"""
+**Release Date:** {details['release_date'] or 'N/A'}  
+**Budget:** {details['budget']}  
+**Revenue:** {details['revenue']}  
+**Genres:** {details['genres']}  
+**Available in:** {details['available_in']}  
+**Directed by:** {details['director']}
+""")
             if details["tagline"]:
-                st.info(f"_{details['tagline']}_")
+                st.info(details["tagline"])
             st.markdown("**Overview:**")
-            st.write(details["overview"] or "No overview available.")
+            st.write(details["overview"])
 
-            # Favorite / Remove Favorite Button
-            if movie_id not in st.session_state.favorites:
-                if st.button("Add to Favorites", key=f"add_fav_{movie_id}"):
-                    st.session_state.favorites.append(movie_id)
-                    st.success("Added to favorites!")
-            else:
-                if st.button("Remove from Favorites", key=f"remove_fav_{movie_id}"):
-                    st.session_state.favorites.remove(movie_id)
-                    st.success("Removed from favorites!")
+            # Optionally, display rating and runtime in columns
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown(f"**Rating:** {details['rating']} / 10 ({details['vote_count']} votes)" if details["rating"] else "**Rating:** N/A")
+            with col2:
+                st.markdown(f"**Runtime:** {details['runtime']} mins" if details["runtime"] else "**Runtime:** N/A")
 
             # Display top cast members
             if details["cast"]:
@@ -290,13 +252,9 @@ if "mode" in st.session_state and st.session_state.mode:
                         st.video(rec["trailer"])
                         
     elif st.session_state.mode == "surprise":
-        # At the top, allow to get another surprise movie
-        if st.button("Show Another Surprise Movie", key="another_surprise"):
-            st.session_state.random_movie = get_random_movie()
         random_data = st.session_state.random_movie
         movie_title = random_data["title"]
         movie_id = random_data.get("movie_id")
-        # In case random_movie doesn't have movie_id, fetch from movies df
         if not movie_id:
             movie_row = movies[movies["title"] == movie_title].iloc[0]
             movie_id = movie_row.movie_id
@@ -313,27 +271,25 @@ if "mode" in st.session_state and st.session_state.mode:
             if poster:
                 st.image(poster, use_column_width=True)
         with detail_col_right:
-            st.markdown(f"**Release Date:** {details['release_date'] or 'N/A'}")
-            st.markdown(f"**Rating:** {details['rating']} / 10 ({details['vote_count']} votes)" if details["rating"] else "**Rating:** N/A")
-            if details["rating"]:
-                st.progress(int(details["rating"] * 10))
-            st.markdown(f"**Runtime:** {details['runtime']} mins" if details["runtime"] else "**Runtime:** N/A")
-            st.markdown(f"**Director:** {details['director'] or 'N/A'}")
-            st.markdown(f"**Genres:** {details['genres']}")
-            st.markdown(f"**Budget:** {details['budget']} &nbsp;&nbsp; **Revenue:** {details['revenue']}")
+            st.markdown("### Movie Details")
+            st.markdown(f"""
+**Release Date:** {details['release_date'] or 'N/A'}  
+**Budget:** {details['budget']}  
+**Revenue:** {details['revenue']}  
+**Genres:** {details['genres']}  
+**Available in:** {details['available_in']}  
+**Directed by:** {details['director']}
+""")
             if details["tagline"]:
-                st.info(f"_{details['tagline']}_")
+                st.info(details["tagline"])
             st.markdown("**Overview:**")
-            st.write(details["overview"] or "No overview available.")
+            st.write(details["overview"])
 
-            if movie_id not in st.session_state.favorites:
-                if st.button("Add to Favorites", key=f"add_fav_{movie_id}"):
-                    st.session_state.favorites.append(movie_id)
-                    st.success("Added to favorites!")
-            else:
-                if st.button("Remove from Favorites", key=f"remove_fav_{movie_id}"):
-                    st.session_state.favorites.remove(movie_id)
-                    st.success("Removed from favorites!")
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown(f"**Rating:** {details['rating']} / 10 ({details['vote_count']} votes)" if details["rating"] else "**Rating:** N/A")
+            with col2:
+                st.markdown(f"**Runtime:** {details['runtime']} mins" if details["runtime"] else "**Runtime:** N/A")
 
             if details["cast"]:
                 st.markdown("**Cast:**")
@@ -347,6 +303,25 @@ if "mode" in st.session_state and st.session_state.mode:
             if trailer_url:
                 with st.expander("Watch Trailer"):
                     st.video(trailer_url)
+
+# ------------------------------
+# Sidebar: Recently Viewed (rendered at the end so it reflects the updated history)
+# ------------------------------
+with st.sidebar:
+    st.header("🕒 Recently Viewed")
+    if st.session_state.history:
+        # Show most recent first
+        for hist_id in reversed(st.session_state.history):
+            movie_row = movies[movies["movie_id"] == hist_id].iloc[0]
+            hist_title = movie_row["title"]
+            hist_poster = fetch_poster(hist_id)
+            if hist_poster:
+                st.image(hist_poster, width=100)
+            if st.button(hist_title, key=f"hist_button_{hist_id}"):
+                st.session_state.mode = "search"
+                st.session_state.selected_movie = hist_title
+    else:
+        st.write("No history yet.")
 
 # ------------------------------
 # Footer
