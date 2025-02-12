@@ -411,7 +411,6 @@ if "mode" in st.session_state and st.session_state.mode:
 with st.sidebar:
     st.header("🕒 Recently Viewed")
     if st.session_state.history:
-        # Show most recent first; ensure unique keys using enumerate
         for i, hist_id in enumerate(reversed(st.session_state.history)):
             movie_row = movies[movies["movie_id"] == hist_id].iloc[0]
             hist_title = movie_row["title"]
@@ -421,6 +420,7 @@ with st.sidebar:
             if st.button(hist_title, key=f"hist_btn_{i}_{hist_id}", use_container_width=True):
                 st.session_state.mode = "search"
                 st.session_state.selected_movie = hist_title
+                st.experimental_rerun()  
     else:
         st.write("No history yet.")
 
