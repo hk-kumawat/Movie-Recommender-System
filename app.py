@@ -240,7 +240,7 @@ if "mode" in st.session_state and st.session_state.mode:
         trailer_url = fetch_trailer(movie_id)
 
         st.markdown("<div style='border-top: 2px solid #eee; margin: 2rem 0;'></div>", unsafe_allow_html=True)
-        st.subheader(f"🎬 Details for: {movie_title}")
+        st.subheader(f"🎬 Details for:  {movie_title}")
 
         # Display poster and details side-by-side
         detail_col_left, detail_col_right = st.columns([1, 2])
@@ -431,6 +431,5 @@ st.markdown("<div style='border-top: 2px solid #eee; margin: 2rem 0;'></div>", u
 st.markdown("""
     <div style='text-align: center; color: #888; padding: 10px; font-size: 0.9rem;'>
         | Made with ❤️ by Harshal Kumawat |<br>
-        <div style='margin-top: 0.5rem;'>Powered by TMDB API</div>
     </div>
 """, unsafe_allow_html=True)
