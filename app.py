@@ -149,7 +149,7 @@ similarity = pickle.load(open("model_files/similarity.pkl", "rb"))
 # ------------------------------
 # UI Configuration and Header
 # ------------------------------
-st.set_page_config(page_title="Movie Recommender", layout="wide")
+st.set_page_config(page_title="🍿 Movie Magic Recommender", page_icon="🍿", layout="wide")
 st.markdown("""
     <h1 style='text-align: center; color: #FF4B4B; margin-bottom: 0.5em;'>
         🍿 Movie Magic Recommender
