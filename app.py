@@ -8,8 +8,8 @@ from requests.packages.urllib3.util.retry import Retry
 # Page Configuration
 # ------------------------------
 st.set_page_config(
-    page_title="🍿 Movie Magic Recommender",
-    page_icon="🎬",
+    page_title="Movie Magic Recommender",
+    page_icon="🍿",
     layout="wide"
 )
 
@@ -184,7 +184,7 @@ st.markdown("""
         🍿 Movie Recommender System
     </h1>
     <p style='text-align: center; color: #555; font-size: 1.2rem; margin-top: 0;'>
-        Discover your next favorite movie! 🎬
+        Let’s Find the Perfect Movie that Matches Your Vibe!🎬
     </p>
     <div style="border-bottom: 2px solid #eee; margin: 1rem 0;"></div>
 """, unsafe_allow_html=True)
@@ -192,7 +192,7 @@ st.markdown("""
 # ------------------------------
 # Trending Movies Section
 # ------------------------------
-st.markdown("### Top 5 Trending Movies")
+st.markdown("### 🔥 Now Trending")
 trending_movies = get_trending_movies()
 trending_cols = st.columns(5)
 for idx, movie in enumerate(trending_movies):
@@ -430,7 +430,7 @@ with st.sidebar:
 st.markdown("<div style='border-top: 2px solid #eee; margin: 2rem 0;'></div>", unsafe_allow_html=True)
 st.markdown("""
     <div style='text-align: center; color: #888; padding: 10px; font-size: 0.9rem;'>
-        Made with ❤️ by Harshal Kumawat<br>
+        | Made with ❤️ by Harshal Kumawat |<br>
         <div style='margin-top: 0.5rem;'>Powered by TMDB API</div>
     </div>
 """, unsafe_allow_html=True)
