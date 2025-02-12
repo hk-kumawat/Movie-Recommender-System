@@ -242,6 +242,17 @@ if "mode" in st.session_state and st.session_state.mode:
             with row2_cols[2]:
                 st.markdown(f"**Directed by:** {details['director']}")
             
+            st.markdown("<br>")
+            # Cast Section (as before)
+            if details["cast"]:
+                st.markdown("#### Cast")
+                cast_cols = st.columns(len(details["cast"]))
+                for idx, actor in enumerate(details["cast"]):
+                    with cast_cols[idx]:
+                        if actor["profile"]:
+                            st.image(actor["profile"], use_container_width=True)
+                        st.caption(f"{actor['name']} as {actor['character']}")
+            
             if trailer_url:
                 with st.expander("Watch Trailer"):
                     st.video(trailer_url)
@@ -319,6 +330,17 @@ if "mode" in st.session_state and st.session_state.mode:
                 st.markdown(f"**Available in:** {details['available_in']}")
             with row2_cols[2]:
                 st.markdown(f"**Directed by:** {details['director']}")
+            
+            st.markdown("<br>")
+            # Cast Section (as before)
+            if details["cast"]:
+                st.markdown("#### Cast")
+                cast_cols = st.columns(len(details["cast"]))
+                for idx, actor in enumerate(details["cast"]):
+                    with cast_cols[idx]:
+                        if actor["profile"]:
+                            st.image(actor["profile"], use_container_width=True)
+                        st.caption(f"{actor['name']} as {actor['character']}")
             
             if trailer_url:
                 with st.expander("Watch Trailer"):
