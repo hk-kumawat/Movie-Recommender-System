@@ -200,23 +200,25 @@ if "mode" in st.session_state and st.session_state.mode:
         with detail_col_left:
             poster = fetch_poster(movie_id)
             if poster:
-                st.image(poster, use_column_width=True)
+                st.image(poster, use_container_width=True)
         with detail_col_right:
             st.markdown("### Movie Details")
-            st.markdown(f"""
-**Release Date:** {details['release_date'] or 'N/A'}  
-**Budget:** {details['budget']}  
-**Revenue:** {details['revenue']}  
-**Genres:** {details['genres']}  
-**Available in:** {details['available_in']}  
-**Directed by:** {details['director']}
-""")
+            # Organize details into two columns: Main details and Additional details
+            col_details_1, col_details_2 = st.columns(2)
+            with col_details_1:
+                st.markdown(f"**Release Date:** {details['release_date'] or 'N/A'}")
+                st.markdown(f"**Directed by:** {details['director']}")
+                st.markdown(f"**Genres:** {details['genres']}")
+            with col_details_2:
+                st.markdown(f"Budget: {details['budget']}")
+                st.markdown(f"Revenue: {details['revenue']}")
+                st.markdown(f"Available in: {details['available_in']}")
             if details["tagline"]:
                 st.info(details["tagline"])
             st.markdown("**Overview:**")
             st.write(details["overview"])
 
-            # Optionally, display rating and runtime in columns
+            # Display rating and runtime in columns
             col1, col2 = st.columns(2)
             with col1:
                 st.markdown(f"**Rating:** {details['rating']} / 10 ({details['vote_count']} votes)" if details["rating"] else "**Rating:** N/A")
@@ -230,7 +232,7 @@ if "mode" in st.session_state and st.session_state.mode:
                 for idx, actor in enumerate(details["cast"]):
                     with cast_cols[idx]:
                         if actor["profile"]:
-                            st.image(actor["profile"], use_column_width=True)
+                            st.image(actor["profile"], use_container_width=True)
                         st.caption(f"{actor['name']} as {actor['character']}")
                         
             if trailer_url:
@@ -245,7 +247,7 @@ if "mode" in st.session_state and st.session_state.mode:
         rec_cols = st.columns(3)
         for idx, rec in enumerate(recommendations):
             with rec_cols[idx % 3]:
-                st.image(rec["poster"], use_column_width=True)
+                st.image(rec["poster"], use_container_width=True)
                 st.markdown(f"**{rec['title']}**")
                 if rec["trailer"]:
                     with st.expander("Trailer"):
@@ -269,17 +271,18 @@ if "mode" in st.session_state and st.session_state.mode:
         with detail_col_left:
             poster = fetch_poster(movie_id)
             if poster:
-                st.image(poster, use_column_width=True)
+                st.image(poster, use_container_width=True)
         with detail_col_right:
             st.markdown("### Movie Details")
-            st.markdown(f"""
-**Release Date:** {details['release_date'] or 'N/A'}  
-**Budget:** {details['budget']}  
-**Revenue:** {details['revenue']}  
-**Genres:** {details['genres']}  
-**Available in:** {details['available_in']}  
-**Directed by:** {details['director']}
-""")
+            col_details_1, col_details_2 = st.columns(2)
+            with col_details_1:
+                st.markdown(f"**Release Date:** {details['release_date'] or 'N/A'}")
+                st.markdown(f"**Directed by:** {details['director']}")
+                st.markdown(f"**Genres:** {details['genres']}")
+            with col_details_2:
+                st.markdown(f"Budget: {details['budget']}")
+                st.markdown(f"Revenue: {details['revenue']}")
+                st.markdown(f"Available in: {details['available_in']}")
             if details["tagline"]:
                 st.info(details["tagline"])
             st.markdown("**Overview:**")
@@ -297,7 +300,7 @@ if "mode" in st.session_state and st.session_state.mode:
                 for idx, actor in enumerate(details["cast"]):
                     with cast_cols[idx]:
                         if actor["profile"]:
-                            st.image(actor["profile"], use_column_width=True)
+                            st.image(actor["profile"], use_container_width=True)
                         st.caption(f"{actor['name']} as {actor['character']}")
                         
             if trailer_url:
