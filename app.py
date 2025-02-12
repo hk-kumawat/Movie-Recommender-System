@@ -4,10 +4,25 @@ import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
-# Retrieve the API key from Streamlit secrets
+# ------------------------------
+# Initialization of Session State
+# ------------------------------
+if "favorites" not in st.session_state:
+    st.session_state.favorites = []  # Stores movie_id of favorite movies
+if "history" not in st.session_state:
+    st.session_state.history = []    # Stores movie_id of recently viewed movies
+if "mode" not in st.session_state:
+    st.session_state.mode = None
+if "selected_movie" not in st.session_state:
+    st.session_state.selected_movie = None
+if "random_movie" not in st.session_state:
+    st.session_state.random_movie = None
+
+# ------------------------------
+# TMDB API and Helper Functions
+# ------------------------------
 TMDB_API_KEY = st.secrets["tmdb"]["api_key"]
 
-# Configure a requests session with retries
 def requests_retry_session(
     retries=5,
     backoff_factor=1,
@@ -27,7 +42,6 @@ def requests_retry_session(
     session.mount("https://", adapter)
     return session
 
-# Helper functions
 def fetch_poster(movie_id):
     try:
         url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}"
@@ -53,7 +67,6 @@ def fetch_trailer(movie_id):
         print(e)
     return None
 
-# Get enriched movie details by appending credits and videos
 def get_movie_details(movie_id):
     try:
         url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}&append_to_response=credits,videos"
@@ -75,6 +88,10 @@ def get_movie_details(movie_id):
                     "character": actor.get("character"),
                     "profile": f"https://image.tmdb.org/t/p/w500{actor['profile_path']}" if actor.get("profile_path") else None
                 })
+            # Additional details: genres, budget, revenue
+            genres = ", ".join([g["name"] for g in data.get("genres", [])]) if data.get("genres") else "N/A"
+            budget = f"${data.get('budget', 0):,}" if data.get('budget', 0) > 0 else "N/A"
+            revenue = f"${data.get('revenue', 0):,}" if data.get('revenue', 0) > 0 else "N/A"
             return {
                 "rating": data.get("vote_average"),
                 "vote_count": data.get("vote_count"),
@@ -82,28 +99,29 @@ def get_movie_details(movie_id):
                 "runtime": data.get("runtime"),
                 "tagline": data.get("tagline"),
                 "overview": data.get("overview"),
-                "director": ", ".join(directors) if directors else None,
-                "cast": cast_details
+                "director": ", ".join(directors) if directors else "N/A",
+                "cast": cast_details,
+                "genres": genres,
+                "budget": budget,
+                "revenue": revenue
             }
     except Exception as e:
         print(e)
     return None
 
-# Recommendation based on similarity
 def recommend(movie):
     index = movies[movies["title"] == movie].index[0]
     distances = sorted(list(enumerate(similarity[index])), reverse=True, key=lambda x: x[1])
-    
     recommendations = []
-    # Take next 5 most similar movies
+    # Take the next 5 most similar movies
     for i in distances[1:6]:
-        movie_id = movies.iloc[i[0]].movie_id
-        poster = fetch_poster(movie_id)
+        rec_movie_id = movies.iloc[i[0]].movie_id
+        poster = fetch_poster(rec_movie_id)
         if poster:
             recommendations.append({
                 "title": movies.iloc[i[0]].title,
                 "poster": poster,
-                "trailer": fetch_trailer(movie_id)
+                "trailer": fetch_trailer(rec_movie_id)
             })
     return recommendations
 
@@ -112,17 +130,20 @@ def get_random_movie():
     return {
         "title": random_movie["title"],
         "poster": fetch_poster(random_movie["movie_id"]),
-        "trailer": fetch_trailer(random_movie["movie_id"])
+        "trailer": fetch_trailer(random_movie["movie_id"]),
+        "movie_id": random_movie["movie_id"]
     }
 
-# Load data
+# ------------------------------
+# Load Data
+# ------------------------------
 movies = pickle.load(open("model_files/movie_list.pkl", "rb"))
 similarity = pickle.load(open("model_files/similarity.pkl", "rb"))
 
-# UI Configuration
+# ------------------------------
+# UI Configuration and Header
+# ------------------------------
 st.set_page_config(page_title="Movie Recommender", layout="wide")
-
-# Header Section
 st.markdown("""
     <h1 style='text-align: center; color: #FF4B4B; padding: 10px 0 0 0;'>
         🍿 Movie Magic Recommender
@@ -133,8 +154,43 @@ st.markdown("""
     <hr style="border:1px solid #eee">
 """, unsafe_allow_html=True)
 
-# --- Main Selection Section ---
-# Two columns: left for search; right for surprise.
+# ------------------------------
+# Sidebar: Favorites & Recently Viewed
+# ------------------------------
+with st.sidebar:
+    st.header("⭐ My Favorites")
+    if st.session_state.favorites:
+        for fav_id in st.session_state.favorites:
+            movie_row = movies[movies["movie_id"] == fav_id].iloc[0]
+            fav_title = movie_row["title"]
+            fav_poster = fetch_poster(fav_id)
+            if fav_poster:
+                st.image(fav_poster, width=100)
+            # Clicking the button loads the favorite movie
+            if st.button(fav_title, key=f"fav_button_{fav_id}"):
+                st.session_state.mode = "search"
+                st.session_state.selected_movie = fav_title
+    else:
+        st.write("No favorites yet.")
+
+    st.header("🕒 Recently Viewed")
+    if st.session_state.history:
+        # Show most recent first
+        for hist_id in reversed(st.session_state.history):
+            movie_row = movies[movies["movie_id"] == hist_id].iloc[0]
+            hist_title = movie_row["title"]
+            hist_poster = fetch_poster(hist_id)
+            if hist_poster:
+                st.image(hist_poster, width=100)
+            if st.button(hist_title, key=f"hist_button_{hist_id}"):
+                st.session_state.mode = "search"
+                st.session_state.selected_movie = hist_title
+    else:
+        st.write("No history yet.")
+
+# ------------------------------
+# Main Selection Section
+# ------------------------------
 col_search, col_surprise = st.columns([3, 2])
 
 with col_search:
@@ -152,11 +208,22 @@ with col_surprise:
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# --- Content Section ---
-if "mode" in st.session_state:
+# ------------------------------
+# Content Section: Movie Details & Recommendations
+# ------------------------------
+def update_history(movie_id):
+    # Add the movie to recently viewed if not the same as the last viewed
+    if not st.session_state.history or st.session_state.history[-1] != movie_id:
+        st.session_state.history.append(movie_id)
+        if len(st.session_state.history) > 5:
+            st.session_state.history.pop(0)
+
+if "mode" in st.session_state and st.session_state.mode:
     if st.session_state.mode == "search":
         movie_title = st.session_state.selected_movie
-        movie_id = movies[movies["title"] == movie_title].iloc[0].movie_id
+        movie_row = movies[movies["title"] == movie_title].iloc[0]
+        movie_id = movie_row.movie_id
+        update_history(movie_id)
         details = get_movie_details(movie_id)
         trailer_url = fetch_trailer(movie_id)
 
@@ -171,22 +238,37 @@ if "mode" in st.session_state:
                 st.image(poster, use_column_width=True)
         with detail_col_right:
             st.markdown(f"**Release Date:** {details['release_date'] or 'N/A'}")
-            st.markdown(f"**Rating:** {details['rating']} / 10 ({details['vote_count']} votes)" if details['rating'] else "**Rating:** N/A")
-            st.markdown(f"**Runtime:** {details['runtime']} mins" if details['runtime'] else "**Runtime:** N/A")
+            st.markdown(f"**Rating:** {details['rating']} / 10 ({details['vote_count']} votes)" if details["rating"] else "**Rating:** N/A")
+            # Visual rating progress bar (scaled to 100)
+            if details["rating"]:
+                st.progress(int(details["rating"] * 10))
+            st.markdown(f"**Runtime:** {details['runtime']} mins" if details["runtime"] else "**Runtime:** N/A")
             st.markdown(f"**Director:** {details['director'] or 'N/A'}")
-            if details['tagline']:
+            st.markdown(f"**Genres:** {details['genres']}")
+            st.markdown(f"**Budget:** {details['budget']} &nbsp;&nbsp; **Revenue:** {details['revenue']}")
+            if details["tagline"]:
                 st.info(f"_{details['tagline']}_")
             st.markdown("**Overview:**")
-            st.write(details['overview'] or "No overview available.")
+            st.write(details["overview"] or "No overview available.")
+
+            # Favorite / Remove Favorite Button
+            if movie_id not in st.session_state.favorites:
+                if st.button("Add to Favorites", key=f"add_fav_{movie_id}"):
+                    st.session_state.favorites.append(movie_id)
+                    st.success("Added to favorites!")
+            else:
+                if st.button("Remove from Favorites", key=f"remove_fav_{movie_id}"):
+                    st.session_state.favorites.remove(movie_id)
+                    st.success("Removed from favorites!")
 
             # Display top cast members
-            if details['cast']:
+            if details["cast"]:
                 st.markdown("**Cast:**")
-                cast_cols = st.columns(len(details['cast']))
-                for idx, actor in enumerate(details['cast']):
+                cast_cols = st.columns(len(details["cast"]))
+                for idx, actor in enumerate(details["cast"]):
                     with cast_cols[idx]:
-                        if actor['profile']:
-                            st.image(actor['profile'], use_column_width=True)
+                        if actor["profile"]:
+                            st.image(actor["profile"], use_column_width=True)
                         st.caption(f"{actor['name']} as {actor['character']}")
                         
             if trailer_url:
@@ -201,20 +283,24 @@ if "mode" in st.session_state:
         rec_cols = st.columns(3)
         for idx, rec in enumerate(recommendations):
             with rec_cols[idx % 3]:
-                st.image(rec['poster'], use_column_width=True)
+                st.image(rec["poster"], use_column_width=True)
                 st.markdown(f"**{rec['title']}**")
-                if rec['trailer']:
+                if rec["trailer"]:
                     with st.expander("Trailer"):
-                        st.video(rec['trailer'])
+                        st.video(rec["trailer"])
                         
     elif st.session_state.mode == "surprise":
-        # Place the "Show Another Surprise Movie" button at the top
+        # At the top, allow to get another surprise movie
         if st.button("Show Another Surprise Movie", key="another_surprise"):
             st.session_state.random_movie = get_random_movie()
-        
         random_data = st.session_state.random_movie
         movie_title = random_data["title"]
-        movie_id = movies[movies["title"] == movie_title].iloc[0].movie_id
+        movie_id = random_data.get("movie_id")
+        # In case random_movie doesn't have movie_id, fetch from movies df
+        if not movie_id:
+            movie_row = movies[movies["title"] == movie_title].iloc[0]
+            movie_id = movie_row.movie_id
+        update_history(movie_id)
         details = get_movie_details(movie_id)
         trailer_url = fetch_trailer(movie_id)
 
@@ -228,28 +314,43 @@ if "mode" in st.session_state:
                 st.image(poster, use_column_width=True)
         with detail_col_right:
             st.markdown(f"**Release Date:** {details['release_date'] or 'N/A'}")
-            st.markdown(f"**Rating:** {details['rating']} / 10 ({details['vote_count']} votes)" if details['rating'] else "**Rating:** N/A")
-            st.markdown(f"**Runtime:** {details['runtime']} mins" if details['runtime'] else "**Runtime:** N/A")
+            st.markdown(f"**Rating:** {details['rating']} / 10 ({details['vote_count']} votes)" if details["rating"] else "**Rating:** N/A")
+            if details["rating"]:
+                st.progress(int(details["rating"] * 10))
+            st.markdown(f"**Runtime:** {details['runtime']} mins" if details["runtime"] else "**Runtime:** N/A")
             st.markdown(f"**Director:** {details['director'] or 'N/A'}")
-            if details['tagline']:
+            st.markdown(f"**Genres:** {details['genres']}")
+            st.markdown(f"**Budget:** {details['budget']} &nbsp;&nbsp; **Revenue:** {details['revenue']}")
+            if details["tagline"]:
                 st.info(f"_{details['tagline']}_")
             st.markdown("**Overview:**")
-            st.write(details['overview'] or "No overview available.")
+            st.write(details["overview"] or "No overview available.")
 
-            if details['cast']:
+            if movie_id not in st.session_state.favorites:
+                if st.button("Add to Favorites", key=f"add_fav_{movie_id}"):
+                    st.session_state.favorites.append(movie_id)
+                    st.success("Added to favorites!")
+            else:
+                if st.button("Remove from Favorites", key=f"remove_fav_{movie_id}"):
+                    st.session_state.favorites.remove(movie_id)
+                    st.success("Removed from favorites!")
+
+            if details["cast"]:
                 st.markdown("**Cast:**")
-                cast_cols = st.columns(len(details['cast']))
-                for idx, actor in enumerate(details['cast']):
+                cast_cols = st.columns(len(details["cast"]))
+                for idx, actor in enumerate(details["cast"]):
                     with cast_cols[idx]:
-                        if actor['profile']:
-                            st.image(actor['profile'], use_column_width=True)
+                        if actor["profile"]:
+                            st.image(actor["profile"], use_column_width=True)
                         st.caption(f"{actor['name']} as {actor['character']}")
                         
             if trailer_url:
                 with st.expander("Watch Trailer"):
                     st.video(trailer_url)
 
-# --- Footer ---
+# ------------------------------
+# Footer
+# ------------------------------
 st.markdown("<hr>", unsafe_allow_html=True)
 st.markdown("""
     <div style='text-align: center; color: #888; padding: 10px; font-size: 0.9rem;'>
