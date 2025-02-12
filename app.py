@@ -214,7 +214,7 @@ col_search, col_spacer, col_surprise = st.columns([3, 1, 2])
 
 with col_search:
     st.subheader("🔍 Search for a Movie")
-    selected_movie = st.selectbox("Type to search...", movies["title"].values, key="select_movie", help="Start typing to find your movie")
+    selected_movie = st.selectbox("Type to search...", movies["title"].values,key="select_movie", help="Start typing to find your movie")
     if st.button("Show Details & Recommendations", key="show_details"):
         st.session_state.mode = "search"
         st.session_state.selected_movie = selected_movie
@@ -408,6 +408,7 @@ if "mode" in st.session_state and st.session_state.mode:
 # ------------------------------
 # Sidebar: Recently Viewed
 # ------------------------------
+
 with st.sidebar:
     st.header("🕒 Recently Viewed")
     if st.session_state.history:
@@ -415,12 +416,24 @@ with st.sidebar:
             movie_row = movies[movies["movie_id"] == hist_id].iloc[0]
             hist_title = movie_row["title"]
             hist_poster = fetch_poster(hist_id)
-            if hist_poster:
-                st.image(hist_poster, width=100)
-            if st.button(hist_title, key=f"hist_btn_{i}_{hist_id}", use_container_width=True):
-                st.session_state.mode = "search"
-                st.session_state.selected_movie = hist_title
-                st.experimental_rerun()  
+            
+            # Create a container for each history item
+            history_container = st.container()
+            with history_container:
+                if hist_poster:
+                    st.image(hist_poster, width=100)
+                
+                # Use a unique key format and update both selectbox states
+                if st.button(
+                    hist_title, 
+                    key=f"hist_{hist_id}_{i}",  # Changed key format
+                    use_container_width=True
+                ):
+                    # Update both the selected movie states
+                    st.session_state.mode = "search"
+                    st.session_state.selected_movie = hist_title
+                    st.session_state.select_movie = hist_title  # Sync selectbox value
+                    st.experimental_rerun()
     else:
         st.write("No history yet.")
 
