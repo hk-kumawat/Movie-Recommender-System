@@ -202,32 +202,39 @@ if "mode" in st.session_state and st.session_state.mode:
             if poster:
                 st.image(poster, use_container_width=True)
         with detail_col_right:
-            st.markdown("### Movie Details")
-            # Organize details into two columns: Main details and Additional details
-            col_details_1, col_details_2 = st.columns(2)
-            with col_details_1:
+            st.markdown("### Key Information")
+            key_cols = st.columns(3)
+            with key_cols[0]:
+                st.markdown(f"**Rating:** <span style='color:green;'>{details['rating'] if details['rating'] is not None else 'N/A'}</span>/10", unsafe_allow_html=True)
+            with key_cols[1]:
+                st.markdown(f"**No. of Ratings:** <span style='color:green;'>{details['vote_count'] if details['vote_count'] is not None else 'N/A'}</span>", unsafe_allow_html=True)
+            with key_cols[2]:
+                runtime_text = f"{details['runtime']} mins" if details['runtime'] is not None else "N/A"
+                st.markdown(f"**Runtime:** <span style='color:green;'>{runtime_text}</span>", unsafe_allow_html=True)
+
+            st.markdown("### Additional Details")
+            detail_cols = st.columns(3)
+            with detail_cols[0]:
                 st.markdown(f"**Release Date:** {details['release_date'] or 'N/A'}")
+            with detail_cols[1]:
                 st.markdown(f"**Directed by:** {details['director']}")
+            with detail_cols[2]:
                 st.markdown(f"**Genres:** {details['genres']}")
-            with col_details_2:
-                st.markdown(f"Budget: {details['budget']}")
-                st.markdown(f"Revenue: {details['revenue']}")
-                st.markdown(f"Available in: {details['available_in']}")
+            detail_cols2 = st.columns(3)
+            with detail_cols2[0]:
+                st.markdown(f"**Budget:** {details['budget']}")
+            with detail_cols2[1]:
+                st.markdown(f"**Revenue:** {details['revenue']}")
+            with detail_cols2[2]:
+                st.markdown(f"**Available in:** {details['available_in']}")
+
             if details["tagline"]:
                 st.info(details["tagline"])
-            st.markdown("**Overview:**")
+            st.markdown("### Overview")
             st.write(details["overview"])
 
-            # Display rating and runtime in columns
-            col1, col2 = st.columns(2)
-            with col1:
-                st.markdown(f"**Rating:** {details['rating']} / 10 ({details['vote_count']} votes)" if details["rating"] else "**Rating:** N/A")
-            with col2:
-                st.markdown(f"**Runtime:** {details['runtime']} mins" if details["runtime"] else "**Runtime:** N/A")
-
-            # Display top cast members
             if details["cast"]:
-                st.markdown("**Cast:**")
+                st.markdown("### Cast")
                 cast_cols = st.columns(len(details["cast"]))
                 for idx, actor in enumerate(details["cast"]):
                     with cast_cols[idx]:
@@ -273,29 +280,39 @@ if "mode" in st.session_state and st.session_state.mode:
             if poster:
                 st.image(poster, use_container_width=True)
         with detail_col_right:
-            st.markdown("### Movie Details")
-            col_details_1, col_details_2 = st.columns(2)
-            with col_details_1:
+            st.markdown("### Key Information")
+            key_cols = st.columns(3)
+            with key_cols[0]:
+                st.markdown(f"**Rating:** <span style='color:green;'>{details['rating'] if details['rating'] is not None else 'N/A'}</span>/10", unsafe_allow_html=True)
+            with key_cols[1]:
+                st.markdown(f"**No. of Ratings:** <span style='color:green;'>{details['vote_count'] if details['vote_count'] is not None else 'N/A'}</span>", unsafe_allow_html=True)
+            with key_cols[2]:
+                runtime_text = f"{details['runtime']} mins" if details['runtime'] is not None else "N/A"
+                st.markdown(f"**Runtime:** <span style='color:green;'>{runtime_text}</span>", unsafe_allow_html=True)
+
+            st.markdown("### Additional Details")
+            detail_cols = st.columns(3)
+            with detail_cols[0]:
                 st.markdown(f"**Release Date:** {details['release_date'] or 'N/A'}")
+            with detail_cols[1]:
                 st.markdown(f"**Directed by:** {details['director']}")
+            with detail_cols[2]:
                 st.markdown(f"**Genres:** {details['genres']}")
-            with col_details_2:
-                st.markdown(f"Budget: {details['budget']}")
-                st.markdown(f"Revenue: {details['revenue']}")
-                st.markdown(f"Available in: {details['available_in']}")
+            detail_cols2 = st.columns(3)
+            with detail_cols2[0]:
+                st.markdown(f"**Budget:** {details['budget']}")
+            with detail_cols2[1]:
+                st.markdown(f"**Revenue:** {details['revenue']}")
+            with detail_cols2[2]:
+                st.markdown(f"**Available in:** {details['available_in']}")
+
             if details["tagline"]:
                 st.info(details["tagline"])
-            st.markdown("**Overview:**")
+            st.markdown("### Overview")
             st.write(details["overview"])
 
-            col1, col2 = st.columns(2)
-            with col1:
-                st.markdown(f"**Rating:** {details['rating']} / 10 ({details['vote_count']} votes)" if details["rating"] else "**Rating:** N/A")
-            with col2:
-                st.markdown(f"**Runtime:** {details['runtime']} mins" if details["runtime"] else "**Runtime:** N/A")
-
             if details["cast"]:
-                st.markdown("**Cast:**")
+                st.markdown("### Cast")
                 cast_cols = st.columns(len(details["cast"]))
                 for idx, actor in enumerate(details["cast"]):
                     with cast_cols[idx]:
