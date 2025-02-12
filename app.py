@@ -184,7 +184,7 @@ st.markdown("""
         🍿 Movie Recommender System
     </h1>
     <p style='text-align: center; color: #555; font-size: 1.2rem; margin-top: 0;'>
-        Let’s Find the Perfect Movie that Matches Your Vibe!🎬
+        Discover your next favorite movie! 🎬
     </p>
     <div style="border-bottom: 2px solid #eee; margin: 1rem 0;"></div>
 """, unsafe_allow_html=True)
@@ -192,24 +192,22 @@ st.markdown("""
 # ------------------------------
 # Trending Movies Section
 # ------------------------------
-st.markdown("### 🔥 Now Trending")
+st.markdown("### 🔥 Trending Now")
 trending_movies = get_trending_movies()
 trending_cols = st.columns(5)
 for idx, movie in enumerate(trending_movies):
     with trending_cols[idx]:
         if movie.get("poster"):
             st.image(movie["poster"], use_container_width=True)
-        # Now simply display the movie title (centered) without a button
+        # Display the movie title as centered text (not a button)
         st.markdown(f"<p style='text-align:center;'>{movie['title']}</p>", unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
-
 st.markdown("---")
 
 # ------------------------------
 # Main Selection Section
 # ------------------------------
-
 col_search, col_spacer, col_surprise = st.columns([3, 1, 2])
 
 with col_search:
@@ -240,7 +238,7 @@ if "mode" in st.session_state and st.session_state.mode:
         trailer_url = fetch_trailer(movie_id)
 
         st.markdown("<div style='border-top: 2px solid #eee; margin: 2rem 0;'></div>", unsafe_allow_html=True)
-        st.subheader(f"🎬 Details for:  {movie_title}")
+        st.subheader(f"🎬 Details for: <span style='background-color: #FFEB3B; color: black; padding: 2px 4px;'>{movie_title}</span>", unsafe_allow_html=True)
 
         # Display poster and details side-by-side
         detail_col_left, detail_col_right = st.columns([1, 2])
@@ -250,7 +248,6 @@ if "mode" in st.session_state and st.session_state.mode:
                 st.image(poster, use_container_width=True)
         with detail_col_right:
             if details:
-                # Group 1: Ratings & Runtime
                 st.markdown("#### Ratings & Runtime")
                 info_cols = st.columns([1, 1, 1])
                 with info_cols[0]:
@@ -264,15 +261,12 @@ if "mode" in st.session_state and st.session_state.mode:
                     st.markdown(f"**Runtime:** <span style='color:green;'>{runtime}</span>", unsafe_allow_html=True)
 
                 st.markdown("<br>", unsafe_allow_html=True)
-                # Tagline in a blue info box
                 if details.get("tagline"):
                     st.info(details["tagline"])
-                # Overview
                 st.markdown("**Overview:**")
                 st.write(details.get("overview", "N/A"))
 
                 st.markdown("<br>", unsafe_allow_html=True)
-                # Group 2: Release & Financials
                 st.markdown("#### Release & Financials")
                 row1_cols = st.columns([1, 1, 1])
                 with row1_cols[0]:
@@ -281,9 +275,8 @@ if "mode" in st.session_state and st.session_state.mode:
                     st.markdown(f"**Budget:** {details.get('budget', 'N/A')}")
                 with row1_cols[2]:
                     st.markdown(f"**Revenue:** {details.get('revenue', 'N/A')}")
-                    
+
                 st.markdown("<br>", unsafe_allow_html=True)
-                # Group 3: Production Details
                 st.markdown("#### Production Details")
                 row2_cols = st.columns([1, 1, 1])
                 with row2_cols[0]:
@@ -292,9 +285,8 @@ if "mode" in st.session_state and st.session_state.mode:
                     st.markdown(f"**Available in:** {details.get('available_in', 'N/A')}")
                 with row2_cols[2]:
                     st.markdown(f"**Directed by:** {details.get('director', 'N/A')}")
-                    
+
                 st.markdown("<br>", unsafe_allow_html=True)
-                # Cast Section
                 if details.get("cast"):
                     st.markdown("#### Cast")
                     cast_cols = st.columns(len(details["cast"]))
@@ -310,7 +302,6 @@ if "mode" in st.session_state and st.session_state.mode:
                 with st.expander("Watch Trailer"):
                     st.video(trailer_url)
 
-        # Display Recommendations
         with st.spinner("Fetching Recommendations..."):
             recommendations = recommend(movie_title)
         st.markdown("<div style='border-top: 2px solid #eee; margin: 2rem 0;'></div>", unsafe_allow_html=True)
@@ -336,7 +327,7 @@ if "mode" in st.session_state and st.session_state.mode:
         trailer_url = fetch_trailer(movie_id)
 
         st.markdown("<div style='border-top: 2px solid #eee; margin: 2rem 0;'></div>", unsafe_allow_html=True)
-        st.subheader(f"🎉 Your Surprise Movie: {movie_title}")
+        st.subheader(f"🎉 Your Surprise Movie: <span style='background-color: #FFEB3B; color: black; padding: 2px 4px;'>{movie_title}</span>", unsafe_allow_html=True)
 
         detail_col_left, detail_col_right = st.columns([1, 2])
         with detail_col_left:
@@ -345,7 +336,6 @@ if "mode" in st.session_state and st.session_state.mode:
                 st.image(poster, use_container_width=True)
         with detail_col_right:
             if details:
-                # Group 1: Ratings & Runtime
                 st.markdown("#### Ratings & Runtime")
                 info_cols = st.columns([1, 1, 1])
                 with info_cols[0]:
@@ -359,15 +349,12 @@ if "mode" in st.session_state and st.session_state.mode:
                     st.markdown(f"**Runtime:** <span style='color:green;'>{runtime}</span>", unsafe_allow_html=True)
 
                 st.markdown("<br>", unsafe_allow_html=True)
-                # Tagline in a blue info box
                 if details.get("tagline"):
                     st.info(details["tagline"])
-                # Overview
                 st.markdown("**Overview:**")
                 st.write(details.get("overview", "N/A"))
 
                 st.markdown("<br>", unsafe_allow_html=True)
-                # Group 2: Release & Financials
                 st.markdown("#### Release & Financials")
                 row1_cols = st.columns([1, 1, 1])
                 with row1_cols[0]:
@@ -378,7 +365,6 @@ if "mode" in st.session_state and st.session_state.mode:
                     st.markdown(f"**Revenue:** {details.get('revenue', 'N/A')}")
                     
                 st.markdown("<br>", unsafe_allow_html=True)
-                # Group 3: Production Details
                 st.markdown("#### Production Details")
                 row2_cols = st.columns([1, 1, 1])
                 with row2_cols[0]:
@@ -389,7 +375,6 @@ if "mode" in st.session_state and st.session_state.mode:
                     st.markdown(f"**Directed by:** {details.get('director', 'N/A')}")
                     
                 st.markdown("<br>", unsafe_allow_html=True)
-                # Cast Section
                 if details.get("cast"):
                     st.markdown("#### Cast")
                     cast_cols = st.columns(len(details["cast"]))
@@ -411,7 +396,6 @@ if "mode" in st.session_state and st.session_state.mode:
 with st.sidebar:
     st.header("🕒 Recently Viewed")
     if st.session_state.history:
-        # Show most recent first; ensure unique keys using enumerate
         for i, hist_id in enumerate(reversed(st.session_state.history)):
             movie_row = movies[movies["movie_id"] == hist_id].iloc[0]
             hist_title = movie_row["title"]
@@ -421,6 +405,7 @@ with st.sidebar:
             if st.button(hist_title, key=f"hist_btn_{i}_{hist_id}", use_container_width=True):
                 st.session_state.mode = "search"
                 st.session_state.selected_movie = hist_title
+                st.experimental_rerun()  # Force re-run to immediately display the details
     else:
         st.write("No history yet.")
 
@@ -430,6 +415,7 @@ with st.sidebar:
 st.markdown("<div style='border-top: 2px solid #eee; margin: 2rem 0;'></div>", unsafe_allow_html=True)
 st.markdown("""
     <div style='text-align: center; color: #888; padding: 10px; font-size: 0.9rem;'>
-        |  Made with ♥️ by Harshal Kumawat  |<br>
+        Made with ❤️ by Harshal Kumawat<br>
+        <div style='margin-top: 0.5rem;'>Powered by TMDB API</div>
     </div>
 """, unsafe_allow_html=True)
