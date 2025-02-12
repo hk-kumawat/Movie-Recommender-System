@@ -1,7 +1,6 @@
 import streamlit as st
 import pickle
 import requests
-from dotenv import load_dotenv
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
