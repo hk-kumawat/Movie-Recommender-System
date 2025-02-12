@@ -217,8 +217,8 @@ with col_search:
     selected_movie = st.selectbox("Type to search...", movies["title"].values, key="select_movie", help="Start typing to find your movie")
     if st.button("Show Details & Recommendations", key="show_details"):
         st.session_state.mode = "search"
-      st.session_state.selected_movie = selected_movie
-    
+        st.session_state.selected_movie = selected_movie
+
 with col_surprise:
     st.subheader("🎭 Let the Algorithm Decide!")
     if st.button("Surprise Me!", key="surprise_me"):
