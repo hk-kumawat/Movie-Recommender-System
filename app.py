@@ -221,15 +221,15 @@ if "mode" in st.session_state and st.session_state.mode:
                 runtime_text = f"{details['runtime']} mins" if details['runtime'] is not None else "N/A"
                 st.markdown(f"**Runtime:** <span style='color:green;'>{runtime_text}</span>", unsafe_allow_html=True)
 
-            st.write("")
+
             # Tagline in a blue info box
             if details["tagline"]:
                 st.info(details["tagline"])
+
             # Overview
             st.markdown("**Overview:**")
             st.write(details["overview"])
 
-            st.write("")
             # Group 2: Release & Financials
             st.markdown("#### Release & Financials")
             row1_cols = st.columns(3)
@@ -240,7 +240,6 @@ if "mode" in st.session_state and st.session_state.mode:
             with row1_cols[2]:
                 st.markdown(f"**Revenue:** {details['revenue']}")
 
-            st.write("")
             # Group 3: Production Details
             st.markdown("#### Production Details")
             row2_cols = st.columns(3)
@@ -251,7 +250,6 @@ if "mode" in st.session_state and st.session_state.mode:
             with row2_cols[2]:
                 st.markdown(f"**Directed by:** {details['director']}")
 
-            st.write("")
             # Cast Section
             if details["cast"]:
                 st.markdown("#### Cast")
