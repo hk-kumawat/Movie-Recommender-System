@@ -359,20 +359,31 @@ if "mode" in st.session_state and st.session_state.mode:
 # ------------------------------
 # Sidebar: Recently Viewed
 # ------------------------------
+
 with st.sidebar:
     st.header("🕒 Recently Viewed")
     if st.session_state.history:
-        # Add index to create unique keys
-        for idx, hist_id in enumerate(reversed(st.session_state.history)):
+        # Create unique keys using enumerate on reversed list
+        for list_position, hist_id in enumerate(reversed(st.session_state.history)):
             movie_row = movies[movies["movie_id"] == hist_id].iloc[0]
             hist_title = movie_row["title"]
             hist_poster = fetch_poster(hist_id)
-            if hist_poster:
-                st.image(hist_poster, width=100)
-            # Add index to the key
-            if st.button(hist_title, key=f"hist_{idx}_{hist_id}"):
-                st.session_state.mode = "search"
-                st.session_state.selected_movie = hist_title
+            
+            
+            # Use both list position and movie ID for uniqueness
+            container = st.container()
+            with container:
+                if hist_poster:
+                    st.image(hist_poster, width=100)
+                
+                # Create unique key using both position and movie ID
+                if st.button(
+                    hist_title, 
+                    key=f"hist_btn_{list_position}_{hist_id}",
+                    use_container_width=True
+                ):
+                    st.session_state.mode = "search"
+                    st.session_state.selected_movie = hist_title
     else:
         st.write("No history yet.")
 
