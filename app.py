@@ -34,7 +34,7 @@ def fetch_poster(movie_id):
         response = requests_retry_session().get(url)
         if response.status_code == 200:
             data = response.json()
-            poster_path = data.get('poster_path')
+            poster_path = data.get("poster_path")
             if poster_path:
                 return f"https://image.tmdb.org/t/p/w500{poster_path}"
     except Exception as e:
@@ -46,8 +46,8 @@ def fetch_trailer(movie_id):
         url = f"https://api.themoviedb.org/3/movie/{movie_id}/videos?api_key={TMDB_API_KEY}"
         response = requests_retry_session().get(url)
         if response.status_code == 200:
-            for video in response.json().get('results', []):
-                if video.get('type') == 'Trailer' and video.get('site') == 'YouTube':
+            for video in response.json().get("results", []):
+                if video.get("type") == "Trailer" and video.get("site") == "YouTube":
                     return f"https://youtu.be/{video['key']}"
     except Exception as e:
         print(e)
@@ -61,26 +61,29 @@ def get_movie_details(movie_id):
         if response.status_code == 200:
             data = response.json()
             # Directors
-            directors = [crew['name'] for crew in data.get('credits', {}).get('crew', [])
-                         if crew.get('job') == 'Director']
+            directors = [
+                crew["name"]
+                for crew in data.get("credits", {}).get("crew", [])
+                if crew.get("job") == "Director"
+            ]
             # Cast (top 5)
-            cast = data.get('credits', {}).get('cast', [])[:5]
+            cast = data.get("credits", {}).get("cast", [])[:5]
             cast_details = []
             for actor in cast:
                 cast_details.append({
-                    'name': actor.get('name'),
-                    'character': actor.get('character'),
-                    'profile': f"https://image.tmdb.org/t/p/w500{actor['profile_path']}" if actor.get('profile_path') else None
+                    "name": actor.get("name"),
+                    "character": actor.get("character"),
+                    "profile": f"https://image.tmdb.org/t/p/w500{actor['profile_path']}" if actor.get("profile_path") else None
                 })
             return {
-                'rating': data.get('vote_average'),
-                'vote_count': data.get('vote_count'),
-                'release_date': data.get('release_date'),
-                'runtime': data.get('runtime'),
-                'tagline': data.get('tagline'),
-                'overview': data.get('overview'),
-                'director': ', '.join(directors) if directors else None,
-                'cast': cast_details
+                "rating": data.get("vote_average"),
+                "vote_count": data.get("vote_count"),
+                "release_date": data.get("release_date"),
+                "runtime": data.get("runtime"),
+                "tagline": data.get("tagline"),
+                "overview": data.get("overview"),
+                "director": ", ".join(directors) if directors else None,
+                "cast": cast_details
             }
     except Exception as e:
         print(e)
@@ -88,7 +91,7 @@ def get_movie_details(movie_id):
 
 # Recommendation based on similarity
 def recommend(movie):
-    index = movies[movies['title'] == movie].index[0]
+    index = movies[movies["title"] == movie].index[0]
     distances = sorted(list(enumerate(similarity[index])), reverse=True, key=lambda x: x[1])
     
     recommendations = []
@@ -98,23 +101,23 @@ def recommend(movie):
         poster = fetch_poster(movie_id)
         if poster:
             recommendations.append({
-                'title': movies.iloc[i[0]].title,
-                'poster': poster,
-                'trailer': fetch_trailer(movie_id)
+                "title": movies.iloc[i[0]].title,
+                "poster": poster,
+                "trailer": fetch_trailer(movie_id)
             })
     return recommendations
 
 def get_random_movie():
     random_movie = movies.sample(1).iloc[0]
     return {
-        'title': random_movie['title'],
-        'poster': fetch_poster(random_movie['movie_id']),
-        'trailer': fetch_trailer(random_movie['movie_id'])
+        "title": random_movie["title"],
+        "poster": fetch_poster(random_movie["movie_id"]),
+        "trailer": fetch_trailer(random_movie["movie_id"])
     }
 
 # Load data
-movies = pickle.load(open("model_files/movie_list.pkl", 'rb'))
-similarity = pickle.load(open("model_files/similarity.pkl", 'rb'))
+movies = pickle.load(open("model_files/movie_list.pkl", "rb"))
+similarity = pickle.load(open("model_files/similarity.pkl", "rb"))
 
 # UI Configuration
 st.set_page_config(page_title="Movie Recommender", layout="wide")
@@ -136,7 +139,7 @@ col_search, col_surprise = st.columns([3, 2])
 
 with col_search:
     st.subheader("🔍 Search for a Movie")
-    selected_movie = st.selectbox("Type to search...", movies['title'].values, key="select_movie", help="Start typing to find your movie")
+    selected_movie = st.selectbox("Type to search...", movies["title"].values, key="select_movie", help="Start typing to find your movie")
     if st.button("Show Details & Recommendations", key="show_details"):
         st.session_state.mode = "search"
         st.session_state.selected_movie = selected_movie
@@ -153,7 +156,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 if "mode" in st.session_state:
     if st.session_state.mode == "search":
         movie_title = st.session_state.selected_movie
-        movie_id = movies[movies['title'] == movie_title].iloc[0].movie_id
+        movie_id = movies[movies["title"] == movie_title].iloc[0].movie_id
         details = get_movie_details(movie_id)
         trailer_url = fetch_trailer(movie_id)
 
@@ -195,7 +198,6 @@ if "mode" in st.session_state:
             recommendations = recommend(movie_title)
         st.markdown("<hr>", unsafe_allow_html=True)
         st.subheader("🚀 Recommended Movies")
-        # Use three columns to display recommendations
         rec_cols = st.columns(3)
         for idx, rec in enumerate(recommendations):
             with rec_cols[idx % 3]:
@@ -204,12 +206,15 @@ if "mode" in st.session_state:
                 if rec['trailer']:
                     with st.expander("Trailer"):
                         st.video(rec['trailer'])
-
+                        
     elif st.session_state.mode == "surprise":
-        # Surprise mode: show details for a random movie
+        # Place the "Show Another Surprise Movie" button at the top
+        if st.button("Show Another Surprise Movie", key="another_surprise"):
+            st.session_state.random_movie = get_random_movie()
+        
         random_data = st.session_state.random_movie
-        movie_title = random_data['title']
-        movie_id = movies[movies['title'] == movie_title].iloc[0].movie_id
+        movie_title = random_data["title"]
+        movie_id = movies[movies["title"] == movie_title].iloc[0].movie_id
         details = get_movie_details(movie_id)
         trailer_url = fetch_trailer(movie_id)
 
@@ -243,10 +248,6 @@ if "mode" in st.session_state:
             if trailer_url:
                 with st.expander("Watch Trailer"):
                     st.video(trailer_url)
-                    
-        # Update the random movie on button click without calling experimental_rerun()
-        if st.button("Show Another Surprise Movie"):
-            st.session_state.random_movie = get_random_movie()
 
 # --- Footer ---
 st.markdown("<hr>", unsafe_allow_html=True)
