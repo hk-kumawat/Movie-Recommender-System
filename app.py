@@ -1,20 +1,17 @@
 import streamlit as st
 import pickle
 import requests
-import urllib.parse
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
 # ------------------------------
-# Page Configuration and Anchor
+# Page Configuration
 # ------------------------------
 st.set_page_config(
     page_title="🍿 Movie Magic Recommender",
     page_icon="🎬",
     layout="wide"
 )
-# Add an anchor at the top for the Back to Top link
-st.markdown("<a id='top'></a>", unsafe_allow_html=True)
 
 # ------------------------------
 # Session State Initialization
@@ -145,6 +142,18 @@ def get_random_movie():
         "movie_id": random_movie["movie_id"]
     }
 
+def get_trending_movies():
+    try:
+        url = f"https://api.themoviedb.org/3/trending/movie/day?api_key={TMDB_API_KEY}"
+        response = requests_retry_session().get(url)
+        if response.status_code == 200:
+            data = response.json()
+            trending = data.get("results", [])
+            return trending
+    except Exception as e:
+        print(e)
+    return []
+
 def update_history(movie_id):
     # Add the movie to recently viewed if it's not the same as the last viewed
     if not st.session_state.history or st.session_state.history[-1] != movie_id:
@@ -152,35 +161,14 @@ def update_history(movie_id):
         if len(st.session_state.history) > 5:
             st.session_state.history.pop(0)
 
-# --- New Feature: Trending Movies / Top Picks ---
-def get_trending_movies():
-    try:
-        url = f"https://api.themoviedb.org/3/trending/movie/day?api_key={TMDB_API_KEY}"
-        response = requests_retry_session().get(url)
-        if response.status_code == 200:
-            data = response.json()
-            trending_movies = data.get("results", [])
-            trending_list = []
-            for movie in trending_movies[:5]:
-                movie_id = movie.get("id")
-                title = movie.get("title")
-                poster = f"https://image.tmdb.org/t/p/w500{movie.get('poster_path')}" if movie.get("poster_path") else None
-                trailer = fetch_trailer(movie_id)
-                trending_list.append({
-                    "movie_id": movie_id,
-                    "title": title,
-                    "poster": poster,
-                    "trailer": trailer
-                })
-            return trending_list
-        else:
-            return []
-    except Exception as e:
-        print(e)
-        return []
+# ------------------------------
+# Load Data
+# ------------------------------
+movies = pickle.load(open("model_files/movie_list.pkl", "rb"))
+similarity = pickle.load(open("model_files/similarity.pkl", "rb"))
 
 # ------------------------------
-# UI: Header and Trending Movies Section
+# UI Header
 # ------------------------------
 st.markdown("""
     <h1 style='text-align: center; color: #FF4B4B; margin-bottom: 0.5em;'>
@@ -192,29 +180,12 @@ st.markdown("""
     <div style="border-bottom: 2px solid #eee; margin: 1rem 0;"></div>
 """, unsafe_allow_html=True)
 
-# Trending Movies Section
-st.markdown("### Trending Movies / Top Picks")
-trending_movies = get_trending_movies()
-if trending_movies:
-    trending_cols = st.columns(len(trending_movies))
-    for idx, movie in enumerate(trending_movies):
-        with trending_cols[idx]:
-            if movie.get("poster"):
-                st.image(movie["poster"], use_container_width=True)
-            st.markdown(f"<p style='text-align:center;'><strong>{movie['title']}</strong></p>", unsafe_allow_html=True)
-            if st.button("View Details", key=f"trending_{movie['movie_id']}"):
-                st.session_state.mode = "search"
-                st.session_state.selected_movie = movie["title"]
-else:
-    st.write("No trending movies available at the moment.")
-
-st.write("")
-
 # ------------------------------
-# Main Selection Section
+# Main Selection Section (Three Columns)
 # ------------------------------
-col_search, col_surprise = st.columns([3, 2])
+col_search, col_trending, col_surprise = st.columns([3, 2, 3])
 
+# Left Column: Search for a Movie
 with col_search:
     st.subheader("🔍 Search for a Movie")
     selected_movie = st.selectbox("Type to search...", movies["title"].values, key="select_movie", help="Start typing to find your movie")
@@ -222,6 +193,29 @@ with col_search:
         st.session_state.mode = "search"
         st.session_state.selected_movie = selected_movie
 
+# Middle Column: Trending Movies
+with col_trending:
+    st.subheader("🔥 Trending Movies")
+    trending = get_trending_movies()
+    if trending:
+        # Show top 3 trending movies
+        for t_movie in trending[:3]:
+            t_title = t_movie.get("title", "N/A")
+            t_poster_path = t_movie.get("poster_path")
+            if t_poster_path:
+                t_poster = f"https://image.tmdb.org/t/p/w500{t_poster_path}"
+            else:
+                t_poster = None
+            if t_poster:
+                st.image(t_poster, use_container_width=True)
+            st.markdown(f"**{t_title}**")
+            if st.button("View Details", key=f"trending_{t_movie.get('id')}"):
+                st.session_state.mode = "search"
+                st.session_state.selected_movie = t_title
+    else:
+        st.write("No trending movies available.")
+
+# Right Column: Surprise Me!
 with col_surprise:
     st.subheader("🎲 Feeling Adventurous?")
     if st.button("Surprise Me!", key="surprise_me"):
@@ -295,13 +289,6 @@ if "mode" in st.session_state and st.session_state.mode:
                     st.markdown(f"**Available in:** {details.get('available_in', 'N/A')}")
                 with row2_cols[2]:
                     st.markdown(f"**Directed by:** {details.get('director', 'N/A')}")
-
-                st.write("")
-                # Social Sharing Options
-                st.markdown("#### Share This Movie")
-                share_text = f"Check out {movie_title} on Movie Magic Recommender! 🍿"
-                twitter_url = "https://twitter.com/intent/tweet?text=" + urllib.parse.quote(share_text)
-                st.markdown(f"[Share on Twitter]({twitter_url})", unsafe_allow_html=True)
 
                 st.write("")
                 # Cast Section
@@ -386,7 +373,7 @@ if "mode" in st.session_state and st.session_state.mode:
                     st.markdown(f"**Budget:** {details.get('budget', 'N/A')}")
                 with row1_cols[2]:
                     st.markdown(f"**Revenue:** {details.get('revenue', 'N/A')}")
-
+                    
                 st.write("")
                 # Group 3: Production Details
                 st.markdown("#### Production Details")
@@ -397,14 +384,7 @@ if "mode" in st.session_state and st.session_state.mode:
                     st.markdown(f"**Available in:** {details.get('available_in', 'N/A')}")
                 with row2_cols[2]:
                     st.markdown(f"**Directed by:** {details.get('director', 'N/A')}")
-
-                st.write("")
-                # Social Sharing Options
-                st.markdown("#### Share This Movie")
-                share_text = f"Check out {movie_title} on Movie Magic Recommender! 🍿"
-                twitter_url = "https://twitter.com/intent/tweet?text=" + urllib.parse.quote(share_text)
-                st.markdown(f"[Share on Twitter]({twitter_url})", unsafe_allow_html=True)
-
+                    
                 st.write("")
                 # Cast Section
                 if details.get("cast"):
@@ -442,7 +422,7 @@ with st.sidebar:
         st.write("No history yet.")
 
 # ------------------------------
-# Footer and Back to Top Link
+# Footer
 # ------------------------------
 st.markdown("<div style='border-top: 2px solid #eee; margin: 2rem 0;'></div>", unsafe_allow_html=True)
 st.markdown("""
@@ -451,4 +431,3 @@ st.markdown("""
         <div style='margin-top: 0.5rem;'>Powered by TMDB API</div>
     </div>
 """, unsafe_allow_html=True)
-st.markdown("<div style='text-align: center; margin-top: 1rem;'><a href='#top'>⬆️ Back to Top</a></div>", unsafe_allow_html=True)
