@@ -7,7 +7,7 @@ from requests.packages.urllib3.util.retry import Retry
 # Retrieve the API key from Streamlit secrets
 TMDB_API_KEY = st.secrets["tmdb"]["api_key"]
 
-# Configure requests session
+# Configure a requests session with retries
 def requests_retry_session(
     retries=5,
     backoff_factor=1,
@@ -34,9 +34,12 @@ def fetch_poster(movie_id):
         response = requests_retry_session().get(url)
         if response.status_code == 200:
             data = response.json()
-            return f"https://image.tmdb.org/t/p/w500/{data.get('poster_path', '')}"
-    except Exception:
-        return None
+            poster_path = data.get('poster_path')
+            if poster_path:
+                return f"https://image.tmdb.org/t/p/w500{poster_path}"
+    except Exception as e:
+        print(e)
+    return None
 
 def fetch_trailer(movie_id):
     try:
@@ -44,34 +47,52 @@ def fetch_trailer(movie_id):
         response = requests_retry_session().get(url)
         if response.status_code == 200:
             for video in response.json().get('results', []):
-                if video['type'] == 'Trailer' and video['site'] == 'YouTube':
+                if video.get('type') == 'Trailer' and video.get('site') == 'YouTube':
                     return f"https://youtu.be/{video['key']}"
-        return None
-    except Exception:
-        return None
+    except Exception as e:
+        print(e)
+    return None
 
+# Get enriched movie details by appending credits and videos
 def get_movie_details(movie_id):
     try:
-        url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}"
+        url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}&append_to_response=credits,videos"
         response = requests_retry_session().get(url)
         if response.status_code == 200:
             data = response.json()
+            # Directors
+            directors = [crew['name'] for crew in data.get('credits', {}).get('crew', []) 
+                         if crew.get('job') == 'Director']
+            # Cast (top 5)
+            cast = data.get('credits', {}).get('cast', [])[:5]
+            cast_details = []
+            for actor in cast:
+                cast_details.append({
+                    'name': actor.get('name'),
+                    'character': actor.get('character'),
+                    'profile': f"https://image.tmdb.org/t/p/w500{actor['profile_path']}" if actor.get('profile_path') else None
+                })
             return {
                 'rating': data.get('vote_average'),
+                'vote_count': data.get('vote_count'),
                 'release_date': data.get('release_date'),
                 'runtime': data.get('runtime'),
                 'tagline': data.get('tagline'),
-                'director': ', '.join([crew['name'] for crew in data.get('credits', {}).get('crew', []) 
-                          if crew['job'] == 'Director'])
+                'overview': data.get('overview'),
+                'director': ', '.join(directors) if directors else None,
+                'cast': cast_details
             }
-    except Exception:
-        return None
+    except Exception as e:
+        print(e)
+    return None
 
+# Recommendation based on similarity
 def recommend(movie):
     index = movies[movies['title'] == movie].index[0]
     distances = sorted(list(enumerate(similarity[index])), reverse=True, key=lambda x: x[1])
     
     recommendations = []
+    # Take next 5 most similar movies
     for i in distances[1:6]:
         movie_id = movies.iloc[i[0]].movie_id
         poster = fetch_poster(movie_id)
@@ -100,91 +121,137 @@ st.set_page_config(page_title="Movie Recommender", layout="wide")
 
 # Header Section
 st.markdown("""
-    <h1 style='text-align: center; color: #FF4B4B; padding: 20px;'>
+    <h1 style='text-align: center; color: #FF4B4B; padding: 10px 0 0 0;'>
         🍿 Movie Magic Recommender
     </h1>
-    <p style='text-align: center; color: #666; font-size: 1.1rem;'>
+    <p style='text-align: center; color: #555; font-size: 1.2rem;'>
         Discover your next favorite movie! 🎬
     </p>
+    <hr style="border:1px solid #eee">
 """, unsafe_allow_html=True)
 
-# Main Layout
-col1, col2 = st.columns([3, 1])
+# --- Main Selection Section ---
+# Two columns: left for search; right for surprise.
+col_search, col_surprise = st.columns([3, 2])
 
-with col1:
-    selected_movie = st.selectbox("Search for a movie:", movies['title'].values, 
-                                help="Start typing to find movies")
+with col_search:
+    st.subheader("🔍 Search for a Movie")
+    selected_movie = st.selectbox("Type to search...", movies['title'].values, key="select_movie", help="Start typing to find your movie")
+    if st.button("Show Details & Recommendations", key="show_details"):
+        st.session_state.mode = "search"
+        st.session_state.selected_movie = selected_movie
 
-with col2:
-    if st.button("Surprise Me! 🎲", use_container_width=True):
+with col_surprise:
+    st.subheader("🎲 Feeling Adventurous?")
+    if st.button("Surprise Me!", key="surprise_me"):
+        st.session_state.mode = "surprise"
         st.session_state.random_movie = get_random_movie()
 
-# Selected Movie Details
-if selected_movie:
-    movie_id = movies[movies['title'] == selected_movie].iloc[0].movie_id
-    details = get_movie_details(movie_id)
-    trailer_url = fetch_trailer(movie_id)
-    
-    st.markdown("---")
-    st.subheader(f"About {selected_movie}")
-    
-    if details:
-        cols = st.columns([2, 3])
-        with cols[0]:
-            if poster := fetch_poster(movie_id):
-                st.image(poster, use_container_width=True)
-        
-        with cols[1]:
-            st.markdown(f"**📅 Release Year:** {details['release_date'][:4] if details['release_date'] else 'N/A'}") 
-            st.markdown(f"**⭐ Rating:** {details['rating']}/10" if details['rating'] else '**⭐ Rating:** N/A')
-            st.markdown(f"**⏱ Runtime:** {details['runtime']} mins" if details['runtime'] else '**⏱ Runtime:** N/A')
-            st.markdown(f"**🎬 Director:** {details['director']}" if details['director'] else '**🎬 Director:** N/A')
-            
-            if details['tagline']:
-                st.markdown(f"*\"{details['tagline']}\"*")
-            
-            if trailer_url:
-                st.video(trailer_url)
+st.markdown("<br>", unsafe_allow_html=True)
 
-# Random Movie Section
-if 'random_movie' in st.session_state:
-    st.markdown("---")
-    st.subheader("🎉 Your Random Pick!")
-    
-    cols = st.columns([2, 3])
-    with cols[0]:
-        if st.session_state.random_movie['poster']:
-            st.image(st.session_state.random_movie['poster'], use_container_width=True)
-    
-    with cols[1]:
-        st.markdown(f"## {st.session_state.random_movie['title']}")
-        if st.button("Try Another Random Movie"):
+# --- Content Section ---
+if "mode" in st.session_state:
+    if st.session_state.mode == "search":
+        movie_title = st.session_state.selected_movie
+        movie_id = movies[movies['title'] == movie_title].iloc[0].movie_id
+        details = get_movie_details(movie_id)
+        trailer_url = fetch_trailer(movie_id)
+
+        st.markdown("<hr>", unsafe_allow_html=True)
+        st.subheader(f"🎬 Details for: {movie_title}")
+
+        # Display Movie Details
+        detail_col_left, detail_col_right = st.columns([1, 2])
+        with detail_col_left:
+            poster = fetch_poster(movie_id)
+            if poster:
+                st.image(poster, use_column_width=True)
+        with detail_col_right:
+            st.markdown(f"**Release Date:** {details['release_date'] or 'N/A'}")
+            st.markdown(f"**Rating:** {details['rating']} / 10 ({details['vote_count']} votes)" if details['rating'] else "**Rating:** N/A")
+            st.markdown(f"**Runtime:** {details['runtime']} mins" if details['runtime'] else "**Runtime:** N/A")
+            st.markdown(f"**Director:** {details['director'] or 'N/A'}")
+            if details['tagline']:
+                st.info(f"_{details['tagline']}_")
+            st.markdown("**Overview:**")
+            st.write(details['overview'] or "No overview available.")
+
+            # Display top cast members
+            if details['cast']:
+                st.markdown("**Cast:**")
+                cast_cols = st.columns(len(details['cast']))
+                for idx, actor in enumerate(details['cast']):
+                    with cast_cols[idx]:
+                        if actor['profile']:
+                            st.image(actor['profile'], use_column_width=True)
+                        st.caption(f"{actor['name']} as {actor['character']}")
+                        
+            if trailer_url:
+                with st.expander("Watch Trailer"):
+                    st.video(trailer_url)
+
+        # Display Recommendations
+        with st.spinner("Fetching Recommendations..."):
+            recommendations = recommend(movie_title)
+        st.markdown("<hr>", unsafe_allow_html=True)
+        st.subheader("🚀 Recommended Movies")
+        # Use three columns to display recommendations
+        rec_cols = st.columns(3)
+        for idx, rec in enumerate(recommendations):
+            with rec_cols[idx % 3]:
+                st.image(rec['poster'], use_column_width=True)
+                st.markdown(f"**{rec['title']}**")
+                if rec['trailer']:
+                    with st.expander("Trailer"):
+                        st.video(rec['trailer'])
+
+    elif st.session_state.mode == "surprise":
+        # Surprise mode: show details for a random movie
+        random_data = st.session_state.random_movie
+        movie_title = random_data['title']
+        movie_id = movies[movies['title'] == movie_title].iloc[0].movie_id
+        details = get_movie_details(movie_id)
+        trailer_url = fetch_trailer(movie_id)
+
+        st.markdown("<hr>", unsafe_allow_html=True)
+        st.subheader(f"🎉 Your Surprise Movie: {movie_title}")
+
+        detail_col_left, detail_col_right = st.columns([1, 2])
+        with detail_col_left:
+            poster = fetch_poster(movie_id)
+            if poster:
+                st.image(poster, use_column_width=True)
+        with detail_col_right:
+            st.markdown(f"**Release Date:** {details['release_date'] or 'N/A'}")
+            st.markdown(f"**Rating:** {details['rating']} / 10 ({details['vote_count']} votes)" if details['rating'] else "**Rating:** N/A")
+            st.markdown(f"**Runtime:** {details['runtime']} mins" if details['runtime'] else "**Runtime:** N/A")
+            st.markdown(f"**Director:** {details['director'] or 'N/A'}")
+            if details['tagline']:
+                st.info(f"_{details['tagline']}_")
+            st.markdown("**Overview:**")
+            st.write(details['overview'] or "No overview available.")
+
+            if details['cast']:
+                st.markdown("**Cast:**")
+                cast_cols = st.columns(len(details['cast']))
+                for idx, actor in enumerate(details['cast']):
+                    with cast_cols[idx]:
+                        if actor['profile']:
+                            st.image(actor['profile'], use_column_width=True)
+                        st.caption(f"{actor['name']} as {actor['character']}")
+                        
+            if trailer_url:
+                with st.expander("Watch Trailer"):
+                    st.video(trailer_url)
+                    
+        if st.button("Show Another Surprise Movie"):
             st.session_state.random_movie = get_random_movie()
             st.experimental_rerun()
-        
-        if st.session_state.random_movie['trailer']:
-            st.video(st.session_state.random_movie['trailer'])
 
-# Recommendations Section
-if st.button("Get Recommendations 🚀", type="primary"):
-    with st.spinner("Finding perfect matches..."):
-        recommendations = recommend(selected_movie)
-    
-    st.markdown("---")
-    st.subheader("Recommended Movies")
-    
-    cols = st.columns(5)
-    for idx, movie in enumerate(recommendations):
-        with cols[idx % 5]:
-            st.image(movie['poster'], caption=movie['title'], use_container_width=True)
-            if movie['trailer']:
-                st.video(movie['trailer'])
-
-# Footer
-st.markdown("---")
+# --- Footer ---
+st.markdown("<hr>", unsafe_allow_html=True)
 st.markdown("""
-    <div style='text-align: center; color: #666; padding: 20px;'>
-        Made with ❤️ by Harshal Kumawat | 
-        <a href="https://www.themoviedb.org/" target="_blank">Powered by TMDB</a>
+    <div style='text-align: center; color: #888; padding: 10px; font-size: 0.9rem;'>
+        Made with ❤️ by Harshal Kumawat
     </div>
 """, unsafe_allow_html=True)
