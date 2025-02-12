@@ -362,14 +362,15 @@ if "mode" in st.session_state and st.session_state.mode:
 with st.sidebar:
     st.header("🕒 Recently Viewed")
     if st.session_state.history:
-        # Show most recent first; use enumerate to ensure unique keys
-        for i, hist_id in enumerate(reversed(st.session_state.history)):
+        # Add index to create unique keys
+        for idx, hist_id in enumerate(reversed(st.session_state.history)):
             movie_row = movies[movies["movie_id"] == hist_id].iloc[0]
             hist_title = movie_row["title"]
             hist_poster = fetch_poster(hist_id)
             if hist_poster:
                 st.image(hist_poster, width=100)
-            if st.button(hist_title, key=f"hist_button_{hist_id}_{i}"):
+            # Add index to the key
+            if st.button(hist_title, key=f"hist_{idx}_{hist_id}"):
                 st.session_state.mode = "search"
                 st.session_state.selected_movie = hist_title
     else:
