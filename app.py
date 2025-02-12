@@ -8,7 +8,7 @@ from requests.packages.urllib3.util.retry import Retry
 # Page Configuration
 # ------------------------------
 st.set_page_config(
-    page_title="Movie Recommender System",
+    page_title="🍿 Movie Magic Recommender",
     page_icon="🎬",
     layout="wide"
 )
@@ -221,15 +221,15 @@ if "mode" in st.session_state and st.session_state.mode:
                 runtime_text = f"{details['runtime']} mins" if details['runtime'] is not None else "N/A"
                 st.markdown(f"**Runtime:** <span style='color:green;'>{runtime_text}</span>", unsafe_allow_html=True)
 
-
+            st.write("")
             # Tagline in a blue info box
             if details["tagline"]:
                 st.info(details["tagline"])
-
             # Overview
             st.markdown("**Overview:**")
             st.write(details["overview"])
 
+            st.write("")
             # Group 2: Release & Financials
             st.markdown("#### Release & Financials")
             row1_cols = st.columns(3)
@@ -240,6 +240,7 @@ if "mode" in st.session_state and st.session_state.mode:
             with row1_cols[2]:
                 st.markdown(f"**Revenue:** {details['revenue']}")
 
+            st.write("")
             # Group 3: Production Details
             st.markdown("#### Production Details")
             row2_cols = st.columns(3)
@@ -250,6 +251,7 @@ if "mode" in st.session_state and st.session_state.mode:
             with row2_cols[2]:
                 st.markdown(f"**Directed by:** {details['director']}")
 
+            st.write("")
             # Cast Section
             if details["cast"]:
                 st.markdown("#### Cast")
@@ -360,14 +362,14 @@ if "mode" in st.session_state and st.session_state.mode:
 with st.sidebar:
     st.header("🕒 Recently Viewed")
     if st.session_state.history:
-        # Show most recent first
-        for hist_id in reversed(st.session_state.history):
+        # Show most recent first; use enumerate to ensure unique keys
+        for i, hist_id in enumerate(reversed(st.session_state.history)):
             movie_row = movies[movies["movie_id"] == hist_id].iloc[0]
             hist_title = movie_row["title"]
             hist_poster = fetch_poster(hist_id)
             if hist_poster:
                 st.image(hist_poster, width=100)
-            if st.button(hist_title, key=f"hist_button_{hist_id}"):
+            if st.button(hist_title, key=f"hist_button_{hist_id}_{i}"):
                 st.session_state.mode = "search"
                 st.session_state.selected_movie = hist_title
     else:
