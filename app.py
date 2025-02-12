@@ -61,7 +61,7 @@ def get_movie_details(movie_id):
         if response.status_code == 200:
             data = response.json()
             # Directors
-            directors = [crew['name'] for crew in data.get('credits', {}).get('crew', []) 
+            directors = [crew['name'] for crew in data.get('credits', {}).get('crew', [])
                          if crew.get('job') == 'Director']
             # Cast (top 5)
             cast = data.get('credits', {}).get('cast', [])[:5]
@@ -165,7 +165,7 @@ if "mode" in st.session_state:
         with detail_col_left:
             poster = fetch_poster(movie_id)
             if poster:
-                st.image(poster, use_container_width=True)
+                st.image(poster, use_column_width=True)
         with detail_col_right:
             st.markdown(f"**Release Date:** {details['release_date'] or 'N/A'}")
             st.markdown(f"**Rating:** {details['rating']} / 10 ({details['vote_count']} votes)" if details['rating'] else "**Rating:** N/A")
@@ -183,7 +183,7 @@ if "mode" in st.session_state:
                 for idx, actor in enumerate(details['cast']):
                     with cast_cols[idx]:
                         if actor['profile']:
-                            st.image(actor['profile'], use_container_width=True)
+                            st.image(actor['profile'], use_column_width=True)
                         st.caption(f"{actor['name']} as {actor['character']}")
                         
             if trailer_url:
@@ -199,7 +199,7 @@ if "mode" in st.session_state:
         rec_cols = st.columns(3)
         for idx, rec in enumerate(recommendations):
             with rec_cols[idx % 3]:
-                st.image(rec['poster'], use_container_width=True)
+                st.image(rec['poster'], use_column_width=True)
                 st.markdown(f"**{rec['title']}**")
                 if rec['trailer']:
                     with st.expander("Trailer"):
@@ -220,7 +220,7 @@ if "mode" in st.session_state:
         with detail_col_left:
             poster = fetch_poster(movie_id)
             if poster:
-                st.image(poster, use_container_width=True)
+                st.image(poster, use_column_width=True)
         with detail_col_right:
             st.markdown(f"**Release Date:** {details['release_date'] or 'N/A'}")
             st.markdown(f"**Rating:** {details['rating']} / 10 ({details['vote_count']} votes)" if details['rating'] else "**Rating:** N/A")
@@ -237,16 +237,16 @@ if "mode" in st.session_state:
                 for idx, actor in enumerate(details['cast']):
                     with cast_cols[idx]:
                         if actor['profile']:
-                            st.image(actor['profile'], use_container_width=True)
+                            st.image(actor['profile'], use_column_width=True)
                         st.caption(f"{actor['name']} as {actor['character']}")
                         
             if trailer_url:
                 with st.expander("Watch Trailer"):
                     st.video(trailer_url)
                     
+        # Update the random movie on button click without calling experimental_rerun()
         if st.button("Show Another Surprise Movie"):
             st.session_state.random_movie = get_random_movie()
-            st.experimental_rerun()
 
 # --- Footer ---
 st.markdown("<hr>", unsafe_allow_html=True)
