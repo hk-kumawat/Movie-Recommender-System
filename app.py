@@ -199,12 +199,10 @@ for idx, movie in enumerate(trending_movies):
     with trending_cols[idx]:
         if movie.get("poster"):
             st.image(movie["poster"], use_container_width=True)
-        # The movie title itself is used as a clickable button
-        if st.button(movie["title"], key=f"trending_{movie['movie_id']}"):
-            st.session_state.mode = "search"
-            st.session_state.selected_movie = movie["title"]
+        # Now simply display the movie title (centered) without a button
+        st.markdown(f"<p style='text-align:center;'>{movie['title']}</p>", unsafe_allow_html=True)
 
-st.write("")
+st.markdown("<br>", unsafe_allow_html=True)
 
 # ------------------------------
 # Main Selection Section
@@ -225,7 +223,7 @@ with col_surprise:
         st.session_state.mode = "surprise"
         st.session_state.random_movie = get_random_movie()
 
-st.write("")
+st.markdown("<br>", unsafe_allow_html=True)
 
 # ------------------------------
 # Content Section: Movie Details & Recommendations
@@ -263,7 +261,7 @@ if "mode" in st.session_state and st.session_state.mode:
                     runtime = f"{details.get('runtime', 'N/A')} mins" if details.get('runtime') else "N/A"
                     st.markdown(f"**Runtime:** <span style='color:green;'>{runtime}</span>", unsafe_allow_html=True)
 
-                st.write("")
+                st.markdown("<br>", unsafe_allow_html=True)
                 # Tagline in a blue info box
                 if details.get("tagline"):
                     st.info(details["tagline"])
@@ -271,7 +269,7 @@ if "mode" in st.session_state and st.session_state.mode:
                 st.markdown("**Overview:**")
                 st.write(details.get("overview", "N/A"))
 
-                st.write("")
+                st.markdown("<br>", unsafe_allow_html=True)
                 # Group 2: Release & Financials
                 st.markdown("#### Release & Financials")
                 row1_cols = st.columns([1, 1, 1])
@@ -281,8 +279,8 @@ if "mode" in st.session_state and st.session_state.mode:
                     st.markdown(f"**Budget:** {details.get('budget', 'N/A')}")
                 with row1_cols[2]:
                     st.markdown(f"**Revenue:** {details.get('revenue', 'N/A')}")
-
-                st.write("")
+                    
+                st.markdown("<br>", unsafe_allow_html=True)
                 # Group 3: Production Details
                 st.markdown("#### Production Details")
                 row2_cols = st.columns([1, 1, 1])
@@ -292,8 +290,8 @@ if "mode" in st.session_state and st.session_state.mode:
                     st.markdown(f"**Available in:** {details.get('available_in', 'N/A')}")
                 with row2_cols[2]:
                     st.markdown(f"**Directed by:** {details.get('director', 'N/A')}")
-
-                st.write("")
+                    
+                st.markdown("<br>", unsafe_allow_html=True)
                 # Cast Section
                 if details.get("cast"):
                     st.markdown("#### Cast")
@@ -358,7 +356,7 @@ if "mode" in st.session_state and st.session_state.mode:
                     runtime = f"{details.get('runtime', 'N/A')} mins" if details.get('runtime') else "N/A"
                     st.markdown(f"**Runtime:** <span style='color:green;'>{runtime}</span>", unsafe_allow_html=True)
 
-                st.write("")
+                st.markdown("<br>", unsafe_allow_html=True)
                 # Tagline in a blue info box
                 if details.get("tagline"):
                     st.info(details["tagline"])
@@ -366,7 +364,7 @@ if "mode" in st.session_state and st.session_state.mode:
                 st.markdown("**Overview:**")
                 st.write(details.get("overview", "N/A"))
 
-                st.write("")
+                st.markdown("<br>", unsafe_allow_html=True)
                 # Group 2: Release & Financials
                 st.markdown("#### Release & Financials")
                 row1_cols = st.columns([1, 1, 1])
@@ -376,8 +374,8 @@ if "mode" in st.session_state and st.session_state.mode:
                     st.markdown(f"**Budget:** {details.get('budget', 'N/A')}")
                 with row1_cols[2]:
                     st.markdown(f"**Revenue:** {details.get('revenue', 'N/A')}")
-
-                st.write("")
+                    
+                st.markdown("<br>", unsafe_allow_html=True)
                 # Group 3: Production Details
                 st.markdown("#### Production Details")
                 row2_cols = st.columns([1, 1, 1])
@@ -387,8 +385,8 @@ if "mode" in st.session_state and st.session_state.mode:
                     st.markdown(f"**Available in:** {details.get('available_in', 'N/A')}")
                 with row2_cols[2]:
                     st.markdown(f"**Directed by:** {details.get('director', 'N/A')}")
-                
-                st.write("")
+                    
+                st.markdown("<br>", unsafe_allow_html=True)
                 # Cast Section
                 if details.get("cast"):
                     st.markdown("#### Cast")
