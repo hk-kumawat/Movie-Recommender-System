@@ -212,13 +212,17 @@ if "mode" in st.session_state and st.session_state.mode:
                 runtime_text = f"{details['runtime']} mins" if details['runtime'] is not None else "N/A"
                 st.markdown(f"**Runtime:** <span style='color:green;'>{runtime_text}</span>", unsafe_allow_html=True)
             
-            # Tagline
+            st.markdown("<br>", unsafe_allow_html=True)
+            
+            # Tagline (if exists)
             if details["tagline"]:
                 st.markdown(f"*{details['tagline']}*")
             
             # Overview
             st.markdown("**Overview:**")
             st.write(details["overview"])
+            
+            st.markdown("<br>", unsafe_allow_html=True)
             
             # Second row: Release Date, Budget, Revenue
             row1_cols = st.columns(3)
@@ -228,6 +232,8 @@ if "mode" in st.session_state and st.session_state.mode:
                 st.markdown(f"**Budget:** {details['budget']}")
             with row1_cols[2]:
                 st.markdown(f"**Revenue:** {details['revenue']}")
+            
+            st.markdown("<br>", unsafe_allow_html=True)
             
             # Third row: Genres, Available in, Directed by
             row2_cols = st.columns(3)
@@ -251,7 +257,7 @@ if "mode" in st.session_state and st.session_state.mode:
         for idx, rec in enumerate(recommendations):
             with rec_cols[idx % 3]:
                 st.image(rec["poster"], use_container_width=True)
-                st.markdown(f"**{rec['title']}**")
+                st.markdown(f"<p style='text-align: center; font-weight: bold;'>{rec['title']}</p>", unsafe_allow_html=True)
                 if rec["trailer"]:
                     with st.expander("Trailer"):
                         st.video(rec["trailer"])
@@ -286,13 +292,17 @@ if "mode" in st.session_state and st.session_state.mode:
                 runtime_text = f"{details['runtime']} mins" if details['runtime'] is not None else "N/A"
                 st.markdown(f"**Runtime:** <span style='color:green;'>{runtime_text}</span>", unsafe_allow_html=True)
             
-            # Tagline
+            st.markdown("<br>", unsafe_allow_html=True)
+            
+            # Tagline (if exists)
             if details["tagline"]:
                 st.markdown(f"*{details['tagline']}*")
             
             # Overview
             st.markdown("**Overview:**")
             st.write(details["overview"])
+            
+            st.markdown("<br>", unsafe_allow_html=True)
             
             # Second row: Release Date, Budget, Revenue
             row1_cols = st.columns(3)
@@ -302,6 +312,8 @@ if "mode" in st.session_state and st.session_state.mode:
                 st.markdown(f"**Budget:** {details['budget']}")
             with row1_cols[2]:
                 st.markdown(f"**Revenue:** {details['revenue']}")
+            
+            st.markdown("<br>", unsafe_allow_html=True)
             
             # Third row: Genres, Available in, Directed by
             row2_cols = st.columns(3)
