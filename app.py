@@ -178,7 +178,7 @@ with col_surprise:
         st.session_state.mode = "surprise"
         st.session_state.random_movie = get_random_movie()
 
-st.markdown("<br>", unsafe_allow_html=True)
+st.write("")
 
 # ------------------------------
 # Content Section: Movie Details & Recommendations
@@ -212,15 +212,16 @@ if "mode" in st.session_state and st.session_state.mode:
             with info_cols[2]:
                 runtime_text = f"{details['runtime']} mins" if details['runtime'] is not None else "N/A"
                 st.markdown(f"**Runtime:** <span style='color:green;'>{runtime_text}</span>", unsafe_allow_html=True)
-            
-            st.markdown("<br>")
-            # Tagline and Overview
+
+            st.write("")
+            # Tagline in a blue info box
             if details["tagline"]:
-                st.markdown(f"*{details['tagline']}*")
+                st.info(details["tagline"])
+            # Overview
             st.markdown("**Overview:**")
             st.write(details["overview"])
-            
-            st.markdown("<br>")
+
+            st.write("")
             # Group 2: Release & Financials
             st.markdown("#### Release & Financials")
             row1_cols = st.columns(3)
@@ -230,8 +231,8 @@ if "mode" in st.session_state and st.session_state.mode:
                 st.markdown(f"**Budget:** {details['budget']}")
             with row1_cols[2]:
                 st.markdown(f"**Revenue:** {details['revenue']}")
-            
-            st.markdown("<br>")
+
+            st.write("")
             # Group 3: Production Details
             st.markdown("#### Production Details")
             row2_cols = st.columns(3)
@@ -241,9 +242,9 @@ if "mode" in st.session_state and st.session_state.mode:
                 st.markdown(f"**Available in:** {details['available_in']}")
             with row2_cols[2]:
                 st.markdown(f"**Directed by:** {details['director']}")
-            
-            st.markdown("<br>")
-            # Cast Section (as before)
+
+            st.write("")
+            # Cast Section
             if details["cast"]:
                 st.markdown("#### Cast")
                 cast_cols = st.columns(len(details["cast"]))
@@ -252,7 +253,7 @@ if "mode" in st.session_state and st.session_state.mode:
                         if actor["profile"]:
                             st.image(actor["profile"], use_container_width=True)
                         st.caption(f"{actor['name']} as {actor['character']}")
-            
+
             if trailer_url:
                 with st.expander("Watch Trailer"):
                     st.video(trailer_url)
@@ -301,15 +302,16 @@ if "mode" in st.session_state and st.session_state.mode:
             with info_cols[2]:
                 runtime_text = f"{details['runtime']} mins" if details['runtime'] is not None else "N/A"
                 st.markdown(f"**Runtime:** <span style='color:green;'>{runtime_text}</span>", unsafe_allow_html=True)
-            
-            st.markdown("<br>")
-            # Tagline and Overview
+
+            st.write("")
+            # Tagline in a blue info box
             if details["tagline"]:
-                st.markdown(f"*{details['tagline']}*")
+                st.info(details["tagline"])
+            # Overview
             st.markdown("**Overview:**")
             st.write(details["overview"])
-            
-            st.markdown("<br>")
+
+            st.write("")
             # Group 2: Release & Financials
             st.markdown("#### Release & Financials")
             row1_cols = st.columns(3)
@@ -319,8 +321,8 @@ if "mode" in st.session_state and st.session_state.mode:
                 st.markdown(f"**Budget:** {details['budget']}")
             with row1_cols[2]:
                 st.markdown(f"**Revenue:** {details['revenue']}")
-            
-            st.markdown("<br>")
+
+            st.write("")
             # Group 3: Production Details
             st.markdown("#### Production Details")
             row2_cols = st.columns(3)
@@ -330,9 +332,9 @@ if "mode" in st.session_state and st.session_state.mode:
                 st.markdown(f"**Available in:** {details['available_in']}")
             with row2_cols[2]:
                 st.markdown(f"**Directed by:** {details['director']}")
-            
-            st.markdown("<br>")
-            # Cast Section (as before)
+
+            st.write("")
+            # Cast Section
             if details["cast"]:
                 st.markdown("#### Cast")
                 cast_cols = st.columns(len(details["cast"]))
@@ -341,7 +343,7 @@ if "mode" in st.session_state and st.session_state.mode:
                         if actor["profile"]:
                             st.image(actor["profile"], use_container_width=True)
                         st.caption(f"{actor['name']} as {actor['character']}")
-            
+
             if trailer_url:
                 with st.expander("Watch Trailer"):
                     st.video(trailer_url)
