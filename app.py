@@ -204,10 +204,12 @@ for idx, movie in enumerate(trending_movies):
 
 st.markdown("<br>", unsafe_allow_html=True)
 
+st.markdown("---")
+
 # ------------------------------
 # Main Selection Section
 # ------------------------------
-# Added an extra spacer column for better spacing between the "Search" and "Surprise" sections.
+
 col_search, col_spacer, col_surprise = st.columns([3, 1, 2])
 
 with col_search:
