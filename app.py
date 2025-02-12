@@ -4,7 +4,9 @@ import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
-
+# ------------------------------
+# Page Configuration
+# ------------------------------
 st.set_page_config(
     page_title="Movie Recommender System",
     page_icon="🎬",
@@ -15,7 +17,7 @@ st.set_page_config(
 # Session State Initialization
 # ------------------------------
 if "history" not in st.session_state:
-    st.session_state.history = []    # Stores movie_id of recently viewed movies
+    st.session_state.history = []  # Stores movie_id of recently viewed movies
 if "mode" not in st.session_state:
     st.session_state.mode = None
 if "selected_movie" not in st.session_state:
@@ -156,15 +158,14 @@ similarity = pickle.load(open("model_files/similarity.pkl", "rb"))
 # ------------------------------
 # UI Configuration and Header
 # ------------------------------
-st.set_page_config(page_title="🍿 Movie Magic Recommender", page_icon="🍿", layout="wide")
 st.markdown("""
     <h1 style='text-align: center; color: #FF4B4B; margin-bottom: 0.5em;'>
-        🍿 Movie Magic Recommender
+        🍿 Movie Recommender System
     </h1>
     <p style='text-align: center; color: #555; font-size: 1.2rem; margin-top: 0;'>
         Discover your next favorite movie! 🎬
     </p>
-    <hr style="border:1px solid #eee">
+    <div style="border-bottom: 2px solid #eee; margin: 1rem 0;"></div>
 """, unsafe_allow_html=True)
 
 # ------------------------------
@@ -199,7 +200,7 @@ if "mode" in st.session_state and st.session_state.mode:
         details = get_movie_details(movie_id)
         trailer_url = fetch_trailer(movie_id)
 
-        st.markdown("<hr>", unsafe_allow_html=True)
+        st.markdown("<div style='border-top: 2px solid #eee; margin: 2rem 0;'></div>", unsafe_allow_html=True)
         st.subheader(f"🎬 Details for: {movie_title}")
 
         # Display poster and details side-by-side
@@ -268,7 +269,7 @@ if "mode" in st.session_state and st.session_state.mode:
         # Display Recommendations
         with st.spinner("Fetching Recommendations..."):
             recommendations = recommend(movie_title)
-        st.markdown("<hr>", unsafe_allow_html=True)
+        st.markdown("<div style='border-top: 2px solid #eee; margin: 2rem 0;'></div>", unsafe_allow_html=True)
         st.subheader("🚀 Recommended Movies")
         rec_cols = st.columns(3)
         for idx, rec in enumerate(recommendations):
@@ -290,7 +291,7 @@ if "mode" in st.session_state and st.session_state.mode:
         details = get_movie_details(movie_id)
         trailer_url = fetch_trailer(movie_id)
 
-        st.markdown("<hr>", unsafe_allow_html=True)
+        st.markdown("<div style='border-top: 2px solid #eee; margin: 2rem 0;'></div>", unsafe_allow_html=True)
         st.subheader(f"🎉 Your Surprise Movie: {movie_title}")
 
         detail_col_left, detail_col_right = st.columns([1, 2])
@@ -356,7 +357,7 @@ if "mode" in st.session_state and st.session_state.mode:
                     st.video(trailer_url)
 
 # ------------------------------
-# Sidebar: Recently Viewed (rendered at the end so it reflects the updated history)
+# Sidebar: Recently Viewed
 # ------------------------------
 with st.sidebar:
     st.header("🕒 Recently Viewed")
@@ -377,9 +378,10 @@ with st.sidebar:
 # ------------------------------
 # Footer
 # ------------------------------
-st.markdown("<hr>", unsafe_allow_html=True)
+st.markdown("<div style='border-top: 2px solid #eee; margin: 2rem 0;'></div>", unsafe_allow_html=True)
 st.markdown("""
     <div style='text-align: center; color: #888; padding: 10px; font-size: 0.9rem;'>
-        Made with ❤️ by Harshal Kumawat
+        Made with ❤️ by Harshal Kumawat<br>
+        <div style='margin-top: 0.5rem;'>Powered by TMDB API</div>
     </div>
 """, unsafe_allow_html=True)
