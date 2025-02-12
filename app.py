@@ -142,24 +142,33 @@ def get_random_movie():
         "movie_id": random_movie["movie_id"]
     }
 
-def get_trending_movies():
-    try:
-        url = f"https://api.themoviedb.org/3/trending/movie/day?api_key={TMDB_API_KEY}"
-        response = requests_retry_session().get(url)
-        if response.status_code == 200:
-            data = response.json()
-            trending = data.get("results", [])
-            return trending
-    except Exception as e:
-        print(e)
-    return []
-
 def update_history(movie_id):
     # Add the movie to recently viewed if it's not the same as the last viewed
     if not st.session_state.history or st.session_state.history[-1] != movie_id:
         st.session_state.history.append(movie_id)
         if len(st.session_state.history) > 5:
             st.session_state.history.pop(0)
+
+def get_trending_movies():
+    try:
+        url = f"https://api.themoviedb.org/3/trending/movie/week?api_key={TMDB_API_KEY}"
+        response = requests_retry_session().get(url)
+        if response.status_code == 200:
+            data = response.json()
+            trending = data.get("results", [])[:5]
+            trending_list = []
+            for movie in trending:
+                trending_list.append({
+                    "title": movie.get("title"),
+                    "poster": f"https://image.tmdb.org/t/p/w500{movie.get('poster_path')}" if movie.get("poster_path") else None,
+                    "movie_id": movie.get("id")
+                })
+            return trending_list
+        else:
+            return []
+    except Exception as e:
+        print(e)
+        return []
 
 # ------------------------------
 # Load Data
@@ -168,7 +177,7 @@ movies = pickle.load(open("model_files/movie_list.pkl", "rb"))
 similarity = pickle.load(open("model_files/similarity.pkl", "rb"))
 
 # ------------------------------
-# UI Header
+# UI Configuration and Header
 # ------------------------------
 st.markdown("""
     <h1 style='text-align: center; color: #FF4B4B; margin-bottom: 0.5em;'>
@@ -181,11 +190,28 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ------------------------------
-# Main Selection Section (Three Columns)
+# Trending Movies Section
 # ------------------------------
-col_search, col_trending, col_surprise = st.columns([3, 2, 3])
+st.markdown("### Top 5 Trending Movies")
+trending_movies = get_trending_movies()
+trending_cols = st.columns(5)
+for idx, movie in enumerate(trending_movies):
+    with trending_cols[idx]:
+        if movie.get("poster"):
+            st.image(movie["poster"], use_container_width=True)
+        # The movie title itself is used as a clickable button
+        if st.button(movie["title"], key=f"trending_{movie['movie_id']}"):
+            st.session_state.mode = "search"
+            st.session_state.selected_movie = movie["title"]
 
-# Left Column: Search for a Movie
+st.write("")
+
+# ------------------------------
+# Main Selection Section
+# ------------------------------
+# Added an extra spacer column for better spacing between the "Search" and "Surprise" sections.
+col_search, col_spacer, col_surprise = st.columns([3, 1, 2])
+
 with col_search:
     st.subheader("🔍 Search for a Movie")
     selected_movie = st.selectbox("Type to search...", movies["title"].values, key="select_movie", help="Start typing to find your movie")
@@ -193,29 +219,6 @@ with col_search:
         st.session_state.mode = "search"
         st.session_state.selected_movie = selected_movie
 
-# Middle Column: Trending Movies
-with col_trending:
-    st.subheader("🔥 Trending Movies")
-    trending = get_trending_movies()
-    if trending:
-        # Show top 3 trending movies
-        for t_movie in trending[:3]:
-            t_title = t_movie.get("title", "N/A")
-            t_poster_path = t_movie.get("poster_path")
-            if t_poster_path:
-                t_poster = f"https://image.tmdb.org/t/p/w500{t_poster_path}"
-            else:
-                t_poster = None
-            if t_poster:
-                st.image(t_poster, use_container_width=True)
-            st.markdown(f"**{t_title}**")
-            if st.button("View Details", key=f"trending_{t_movie.get('id')}"):
-                st.session_state.mode = "search"
-                st.session_state.selected_movie = t_title
-    else:
-        st.write("No trending movies available.")
-
-# Right Column: Surprise Me!
 with col_surprise:
     st.subheader("🎲 Feeling Adventurous?")
     if st.button("Surprise Me!", key="surprise_me"):
@@ -373,7 +376,7 @@ if "mode" in st.session_state and st.session_state.mode:
                     st.markdown(f"**Budget:** {details.get('budget', 'N/A')}")
                 with row1_cols[2]:
                     st.markdown(f"**Revenue:** {details.get('revenue', 'N/A')}")
-                    
+
                 st.write("")
                 # Group 3: Production Details
                 st.markdown("#### Production Details")
@@ -384,7 +387,7 @@ if "mode" in st.session_state and st.session_state.mode:
                     st.markdown(f"**Available in:** {details.get('available_in', 'N/A')}")
                 with row2_cols[2]:
                     st.markdown(f"**Directed by:** {details.get('director', 'N/A')}")
-                    
+                
                 st.write("")
                 # Cast Section
                 if details.get("cast"):
