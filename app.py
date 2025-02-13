@@ -183,7 +183,7 @@ st.markdown("""
     <h1 style='text-align: center; color: #FF4B4B; margin-bottom: 0.5em;'>
         Let’s Find the Perfect Movie that Matches Your Vibe!🎬
     </h1>
-    <p style='text-align: center; color: #7f8c8d; font-size: 1.2rem; margin-top: 0;'>
+    <p style='text-align: center; color: #7f8c8d; font-size: 2.5rem; margin-top: 0;'>
         Just pick a title and let us do the magic ✨
     </p>
     <div style="border-bottom: 2px solid #eee; margin: 1rem 0;"></div>
