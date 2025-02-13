@@ -262,28 +262,18 @@ Explore the deep learning experiment:
 
 ```plaintext
 movie-recommender/
-├── app.py                    # Main Streamlit application
-├── model/
-│   ├── preprocessor.py       # Data preprocessing functions
-│   ├── recommender.py        # Recommendation engine
-│   └── neural_network.py     # Neural network model
-├── utils/
-│   ├── api_handler.py        # TMDB API integration
-│   └── data_loader.py        # Dataset loading utilities
-├── notebooks/
-│   ├── EDA.ipynb            # Exploratory Data Analysis
-│   └── Model_Training.ipynb  # Model training process
-├── tests/                    # Unit tests
-├── requirements.txt          # Project dependencies
-├── LICENSE                   # License information
-├── README.md                 # Project documentation
-├── Dataset/                 # Raw data files
+├── app.py                       # Main Streamlit application           
+├── movie recommender system.ipynb   # Model training process                
+├── requirements.txt             # Project dependencies
+├── LICENSE                      # License information
+├── README.md                    # Project documentation
+├── Dataset/                     # Raw data files
 │   ├── tmdb_5000_credits.csv
 │   └── tmdb_5000_movies.csv
-└── model_files/             # Processed data and models
-    ├── movie_list.pkl
-    ├── similarity.pkl
-    └── .gitattributes
+├── model_files/                 # Processed data and models
+│   ├── movie_list.pkl
+│   ├── similarity.pkl
+└── .gitattributes
 ```
 
 <br> 
