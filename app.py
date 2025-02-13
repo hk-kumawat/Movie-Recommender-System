@@ -214,16 +214,18 @@ col_search, col_spacer, col_surprise = st.columns([3, 1, 2])
 
 with col_search:
     st.subheader("🔍 Search for a Movie")
-    selected_movie = st.selectbox("Type to search...", movies["title"].values,key="select_movie", help="Start typing to find your movie")
+    selected_movie = st.selectbox("Type to search...", movies["title"].values, key="select_movie", help="Start typing to find your movie")
     if st.button("Show Details & Recommendations", key="show_details"):
         st.session_state.mode = "search"
         st.session_state.selected_movie = selected_movie
+        st.balloons()
 
 with col_surprise:
     st.subheader("🎭 Let the Algorithm Decide!")
     if st.button("Surprise Me!", key="surprise_me"):
         st.session_state.mode = "surprise"
         st.session_state.random_movie = get_random_movie()
+        st.balloons()
 
 st.markdown("<br>", unsafe_allow_html=True)
 
@@ -426,13 +428,13 @@ with st.sidebar:
                 # Use a unique key format and update both selectbox states
                 if st.button(
                     hist_title, 
-                    key=f"hist_{hist_id}_{i}",  # Changed key format
+                    key=f"hist_{hist_id}_{i}",
                     use_container_width=True
                 ):
-                    # Update both the selected movie states
                     st.session_state.mode = "search"
                     st.session_state.selected_movie = hist_title
                     st.session_state.select_movie = hist_title  # Sync selectbox value
+                    st.balloons()
                     st.experimental_rerun()
     else:
         st.write("No history yet.")
@@ -446,4 +448,4 @@ st.markdown("""
         |  Made with ♥️ by Harshal Kumawat  |<br>
     </div>
 """, unsafe_allow_html=True)
-        
+
