@@ -261,19 +261,19 @@ Explore the deep learning experiment:
 ## 📁Directory Structure 
 
 ```plaintext
-movie-recommender/
-├── app.py                       # Main Streamlit application           
-├── movie recommender system.ipynb   # Model training process                
-├── requirements.txt             # Project dependencies
-├── LICENSE                      # License information
-├── README.md                    # Project documentation
-├── Dataset/                     # Raw data files
-│   ├── tmdb_5000_credits.csv
-│   └── tmdb_5000_movies.csv
-├── model_files/                 # Processed data and models
-│   ├── movie_list.pkl
-│   ├── similarity.pkl
-└── .gitattributes
+hk-kumawat-movie-recommender-system/
+├── README.md                   # Project documentation
+├── LICENSE                     # License information
+├── Movie Recommender System.ipynb  # Jupyter Notebook for model exploration
+├── app.py                      # Streamlit application for movie recommendations
+├── requirements.txt             # List of dependencies
+├── Dataset/                     # Raw movie dataset
+│   ├── tmdb_5000_credits.csv    # Movie credits data
+│   └── tmdb_5000_movies.csv     # Movie metadata
+└── model_files/                 # Precomputed models for recommendations
+    ├── movie_list.pkl           # Pickled movie data
+    ├── similarity.pkl           # Pickled similarity matrix
+    └── .gitattributes           # Git attributes configuration
 ```
 
 <br> 
