@@ -1,3 +1,5 @@
+<a id="readme-top"></a>
+
 # 🎬 Movie Recommender System 📽️
 
 ![Movie Recommender System Banner](https://github.com/user-attachments/assets/c83f35ad-8079-4a51-831f-0b44714d9a75)
@@ -294,21 +296,26 @@ movie-recommender/
 <br> 
 
 ## 🤝Contributing
-
 Contributions make the open source community such an amazing place to learn, inspire, and create. 🙌 Any contributions you make are greatly appreciated! 😊
 
 Have an idea to improve this project? Go ahead and fork the repo to create a pull request, or open an issue with the tag **"enhancement"**. Don't forget to give the project a star! ⭐ Thanks again! 🙏
 
+<br>
+
 1. **Fork** the repository.
+
 2. **Create** a new branch:
    ```bash
    git checkout -b feature/YourFeatureName
    ```
+
 3. **Commit** your changes with a descriptive message.
+
 4. **Push** to your branch:
    ```bash
    git push origin feature/YourFeatureName
    ```
+
 5. **Open** a Pull Request detailing your enhancements or bug fixes.
 
 <br> 
