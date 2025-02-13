@@ -242,7 +242,8 @@ if "mode" in st.session_state and st.session_state.mode:
         trailer_url = fetch_trailer(movie_id)
 
         st.markdown("<div style='border-top: 2px solid #eee; margin: 2rem 0;'></div>", unsafe_allow_html=True)
-        st.subheader(f"🎬 Details for:  {movie_title}")
+        # Highlighting the movie name in red using HTML inside the markdown
+        st.markdown(f"<h2>🎬 Details for: <span style='color: #FF4B4B;'>{movie_title}</span></h2>", unsafe_allow_html=True)
 
         # Display poster and details side-by-side
         detail_col_left, detail_col_right = st.columns([1, 2])
@@ -338,7 +339,8 @@ if "mode" in st.session_state and st.session_state.mode:
         trailer_url = fetch_trailer(movie_id)
 
         st.markdown("<div style='border-top: 2px solid #eee; margin: 2rem 0;'></div>", unsafe_allow_html=True)
-        st.subheader(f"🎉 Your Surprise Movie: {movie_title}")
+        # Highlighting the movie name in red using HTML inside the markdown
+        st.markdown(f"<h2>🎉 Your Surprise Movie: <span style='color: #FF4B4B;'>{movie_title}</span></h2>", unsafe_allow_html=True)
 
         detail_col_left, detail_col_right = st.columns([1, 2])
         with detail_col_left:
@@ -448,4 +450,3 @@ st.markdown("""
         |  Made with ♥️ by Harshal Kumawat  |<br>
     </div>
 """, unsafe_allow_html=True)
-
