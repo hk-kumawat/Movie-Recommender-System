@@ -181,10 +181,10 @@ similarity = pickle.load(open("model_files/similarity.pkl", "rb"))
 # ------------------------------
 st.markdown("""
     <h1 style='text-align: center; color: #FF4B4B; margin-bottom: 0.5em;'>
-        🍿 Movie Recommender System
+        Let’s Find the Perfect Movie that Matches Your Vibe!🎬
     </h1>
     <p style='text-align: center; color: #555; font-size: 1.2rem; margin-top: 0;'>
-        Let’s Find the Perfect Movie that Matches Your Vibe!🎬
+        Just pick a title and let us do the magic ✨
     </p>
     <div style="border-bottom: 2px solid #eee; margin: 1rem 0;"></div>
 """, unsafe_allow_html=True)
