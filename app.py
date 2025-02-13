@@ -192,7 +192,13 @@ st.markdown("""
 # ------------------------------
 # Trending Movies Section
 # ------------------------------
-st.markdown("### 🔥 Now Trending")
+st.markdown("""
+    <h2 style='text-align: center; color: #FF4B4B; margin-bottom: 1rem;'>
+        🔥 Now Trending
+    </h2>
+    <div style="border-bottom: 2px solid #eee; margin: 1rem auto; width: 50%;"></div>
+""", unsafe_allow_html=True)
+
 trending_movies = get_trending_movies()
 trending_cols = st.columns(5)
 for idx, movie in enumerate(trending_movies):
