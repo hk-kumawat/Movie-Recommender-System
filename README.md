@@ -232,14 +232,7 @@ Explore the deep learning experiment:
   - `Requests`  
   - `urllib3`  
   - **TMDB API Key** (for fetching movie data)
-
-- **Data Augmentation:**  
-  - `ImageDataGenerator` (Keras)
-
-- **Version Control:**  
-  - `Git`  
-  - `GitHub`
-
+ 
 <br> 
 
 ## 🏆Results 
