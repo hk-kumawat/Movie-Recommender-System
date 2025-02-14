@@ -26,7 +26,7 @@ _Below is a preview of the Movie Recommender System in action. Enter a movie nam
 
 <br> 
 
-## Learning Journey
+## Learning Journey 🗺️
 
 I built this project out of a love for movies and a desire to dive into machine learning in a practical way. Here’s a glimpse into my journey:
 
@@ -71,7 +71,7 @@ Every step of this journey has enriched my skills and reinforced my belief that 
 
 <br> 
 
-## 🌟Features 
+## Features🌟
 
 - **Intelligent Recommendation Engine:** Content-based filtering using advanced NLP techniques.
 - **Real-time TMDB Integration:** Live movie data and statistics.
@@ -90,7 +90,7 @@ Every step of this journey has enriched my skills and reinforced my belief that 
 
 <br> 
 
-## 📊Dataset 
+## Dataset📊
 
 The project utilizes the **[TMDb 5000 Movie Dataset](https://www.kaggle.com/datasets/tmdb/tmdb-movie-metadata)**, which includes:
 
@@ -113,7 +113,7 @@ The project utilizes the **[TMDb 5000 Movie Dataset](https://www.kaggle.com/data
 
 <br> 
 
-## 🔄Data Preprocessing 
+## Data Preprocessing🔄
 
 1. **Data Cleaning:**  
    Remove null values and handle duplicate entries.
@@ -130,7 +130,7 @@ The project utilizes the **[TMDb 5000 Movie Dataset](https://www.kaggle.com/data
 <br> 
 
 
-## 🧠Model Training 
+## Model Training🧠
 
 - **Text Vectorization:**  
   Use a `CountVectorizer` to transform text data into vectors with a maximum of 5,000 features.
@@ -182,7 +182,7 @@ The project utilizes the **[TMDb 5000 Movie Dataset](https://www.kaggle.com/data
 
 <br> 
 
-## 🚀Usage 
+## Usage🚀
 
 ### Running the Streamlit App
 
@@ -207,7 +207,7 @@ Explore the deep learning experiment:
 
 <br> 
 
-## 💻Technologies Used 
+## Technologies Used💻
 
 - **Programming Language:**  
   - `Python`
@@ -235,7 +235,7 @@ Explore the deep learning experiment:
  
 <br> 
 
-## 🏆Results 
+## Results🏆
 
 ### Model Performance
 
@@ -258,7 +258,7 @@ Explore the deep learning experiment:
 
 <br> 
 
-## 📁Directory Structure 
+## Directory Structure📁
 
 ```plaintext
 hk-kumawat-movie-recommender-system/
@@ -278,7 +278,7 @@ hk-kumawat-movie-recommender-system/
 
 <br> 
 
-## 🤝Contributing
+## Contributing🤝
 Contributions make the open source community such an amazing place to learn, inspire, and create. 🙌 Any contributions you make are greatly appreciated! 😊
 
 Have an idea to improve this project? Go ahead and fork the repo to create a pull request, or open an issue with the tag **"enhancement"**. Don't forget to give the project a star! ⭐ Thanks again! 🙏
@@ -303,7 +303,7 @@ Have an idea to improve this project? Go ahead and fork the repo to create a pul
 
 <br> 
 
-## 📝License
+## License📝
 
 This project is licensed under the **MIT License** – see the [LICENSE](./LICENSE) file for details.
 
