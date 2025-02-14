@@ -321,9 +321,7 @@ I’d love to connect and discuss further:
 
 <br> 
 
-## Thanks!
-
-Thanks for checking out this movie magic! Enjoy discovering your next favorite film! 🎬🔍
+## Thanks for exploring—happy watching! 🎬
 
 > "Because every movie deserves a fan, and every fan deserves the right movie." – Anonymous
 
