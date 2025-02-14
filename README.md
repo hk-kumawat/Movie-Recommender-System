@@ -56,19 +56,19 @@ Every step of this journey has enriched my skills and reinforced my belief that 
 
 ## Table of Contents
 
-1. [Features](#features)
-2. [Dataset](#dataset)
-3. [Data Preprocessing](#data-preprocessing)
-4. [Model Training](#model-training)
-5. [Installation](#installation)
-6. [Usage](#usage)
-7. [Technologies Used](#technologies-used)
-8. [Results](#results)
-9. [Directory Structure](#directory-structure)
+1.  [Features](#features)
+2.  [Installation](#installation)    
+3.  [Usage](#usage)    
+4.  [Technologies Used](#technologies-used)   
+5.  [Dataset](#dataset)
+6.  [Data Preprocessing](#data-preprocessing)
+7.  [Model Training](#model-training)
+8.  [Results](#results)
+9.  [Directory Structure](#directory-structure)
 10. [Contributing](#contributing)
 11. [License](#license)
 12. [Contact](#contact)
-
+    
 <br> 
 
 ## Features🌟
@@ -90,62 +90,6 @@ Every step of this journey has enriched my skills and reinforced my belief that 
 
 <br> 
 
-## Dataset📊
-
-The project utilizes the **[TMDb 5000 Movie Dataset](https://www.kaggle.com/datasets/tmdb/tmdb-movie-metadata)**, which includes:
-
-1. **tmdb_5000_movies.csv:**
-   - 5000 movies with detailed metadata.
-   - Features: title, overview, genres, keywords, cast, crew.
-   - Release dates spanning multiple decades.
-   - Budget and revenue information.
-
-2. **tmdb_5000_credits.csv:**
-   - Comprehensive cast and crew information.
-   - Details about directors, producers, and writers.
-   - Character names and actor mappings.
-
-**Key Statistics:**
-- **Total Movies:** 5,000  
-- **Unique Genres:** 20  
-- **Date Range:** 1916-2017  
-- **Average Runtime:** 114 minutes
-
-<br> 
-
-## Data Preprocessing🔄
-
-1. **Data Cleaning:**  
-   Remove null values and handle duplicate entries.
-
-2. **Feature Extraction:**  
-   Extract features like **Genres**, **Keywords**, **Cast** (top 3 members), and **Crew** (director).
-
-3. **Text Preprocessing:**  
-   Merge features into a single "tags" column and convert text to lowercase.
-
-4. **Stemming:**  
-   Use PorterStemmer to reduce words to their root forms for optimized similarity matching.
-
-<br> 
-
-
-## Model Training🧠
-
-- **Text Vectorization:**  
-  Use a `CountVectorizer` to transform text data into vectors with a maximum of 5,000 features.
-
-- **Cosine Similarity:**  
-  Compute cosine similarity to create a matrix that measures the closeness between movie pairs.
-
-- **Similarity Search:**  
-  Retrieve the top 5 most similar movies for a selected title.
-
-**Final Model Artifacts:**
-- `movie_list.pkl`: Contains movie data for recommendations.
-- `similarity.pkl`: Stores the cosine similarity matrix.
-
-<br> 
 
 ## Installation🛠 
 
@@ -205,7 +149,8 @@ Explore the deep learning experiment:
    ```
 2. **Execute the cells** to follow along with the model building, training, evaluation, and visualization processes.
 
-<br> 
+<br>
+
 
 ## Technologies Used💻
 
@@ -232,8 +177,67 @@ Explore the deep learning experiment:
   - `Requests`  
   - `urllib3`  
   - **TMDB API Key** (for fetching movie data)
+
+<br>
+
  
+## Dataset📊
+
+The project utilizes the **[TMDb 5000 Movie Dataset](https://www.kaggle.com/datasets/tmdb/tmdb-movie-metadata)**, which includes:
+
+1. **tmdb_5000_movies.csv:**
+   - 5000 movies with detailed metadata.
+   - Features: title, overview, genres, keywords, cast, crew.
+   - Release dates spanning multiple decades.
+   - Budget and revenue information.
+
+2. **tmdb_5000_credits.csv:**
+   - Comprehensive cast and crew information.
+   - Details about directors, producers, and writers.
+   - Character names and actor mappings.
+
+**Key Statistics:**
+- **Total Movies:** 5,000  
+- **Unique Genres:** 20  
+- **Date Range:** 1916-2017  
+- **Average Runtime:** 114 minutes
+
 <br> 
+
+## Data Preprocessing🔄
+
+1. **Data Cleaning:**  
+   Remove null values and handle duplicate entries.
+
+2. **Feature Extraction:**  
+   Extract features like **Genres**, **Keywords**, **Cast** (top 3 members), and **Crew** (director).
+
+3. **Text Preprocessing:**  
+   Merge features into a single "tags" column and convert text to lowercase.
+
+4. **Stemming:**  
+   Use PorterStemmer to reduce words to their root forms for optimized similarity matching.
+
+<br> 
+
+
+## Model Training🧠
+
+- **Text Vectorization:**  
+  Use a `CountVectorizer` to transform text data into vectors with a maximum of 5,000 features.
+
+- **Cosine Similarity:**  
+  Compute cosine similarity to create a matrix that measures the closeness between movie pairs.
+
+- **Similarity Search:**  
+  Retrieve the top 5 most similar movies for a selected title.
+
+**Final Model Artifacts:**
+- `movie_list.pkl`: Contains movie data for recommendations.
+- `similarity.pkl`: Stores the cosine similarity matrix.
+
+<br> 
+
 
 ## Results🏆
 
