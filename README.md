@@ -147,7 +147,7 @@ The project utilizes the **[TMDb 5000 Movie Dataset](https://www.kaggle.com/data
 
 <br> 
 
-## 🛠Installation 
+## Installation🛠 
 
 1. **Clone the repository:**
    ```bash
