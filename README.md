@@ -19,6 +19,28 @@
 
 ---
 
+## 📑 Table of Contents
+
+- [Overview](#-overview)
+- [Features](#-features)
+- [Demo](#-demo)
+- [Architecture](#%EF%B8%8F-architecture)
+- [Tech Stack](#-tech-stack)
+- [Quick Start](#-quick-start)
+- [Installation](#%EF%B8%8F-installation)
+- [Dataset](#-dataset)
+- [Model Training](#-model-training)
+- [Project Structure](#-project-structure)
+- [Performance](#-performance)
+- [How to Use](#-how-to-use)
+- [API Reference](#-api-reference)
+- [FAQ](#-faq)
+- [Contributing](#-contributing)
+- [License](#-license)
+- [Contact](#-contact)
+
+---
+
 ## 📖 Overview
 
 A **content-based movie recommendation system** that suggests films based on similarity in genres, keywords, cast, crew, and plot. Built with Streamlit and powered by machine learning, it provides personalized recommendations with rich metadata from TMDB API.
@@ -44,9 +66,26 @@ A **content-based movie recommendation system** that suggests films based on sim
 | **Viewing History** | Track and revisit recently viewed movies |
 | **Responsive Design** | Mobile-friendly interface |
 
+---
+
+## 🎥 Demo
+
 <div align="center">
   <img src="https://github.com/user-attachments/assets/542691f2-474d-46c3-a7ce-3ffebd697dbe" alt="App Demo" width="700">
+  <p><em>Search for a movie and get instant recommendations with full details</em></p>
 </div>
+
+### Try it Live
+
+👉 **[Launch Live Demo](https://findmynextflick.streamlit.app/#7c707207)**
+
+**What you can do:**
+- Search through 4,800+ movies
+- Get 5 similar movie recommendations instantly
+- View detailed information (cast, crew, budget, ratings, trailers)
+- Discover trending movies weekly
+- Get random movie suggestions
+
 
 ---
 
@@ -92,6 +131,7 @@ A **content-based movie recommendation system** that suggests films based on sim
 similarity(A, B) = (A · B) / (||A|| × ||B||)
 ```
 
+
 ---
 
 ## 🔧 Tech Stack
@@ -116,6 +156,7 @@ similarity(A, B) = (A · B) / (||A|| × ||B||)
 | **API** | TMDB API, Requests |
 | **Deployment** | Streamlit Cloud |
 
+
 ---
 
 ## 🚀 Quick Start
@@ -137,6 +178,7 @@ streamlit run app.py
 ```
 
 **Access the app at:** `http://localhost:8501`
+
 
 ---
 
@@ -200,6 +242,8 @@ streamlit run app.py
 | Port Already in Use | Use `streamlit run app.py --server.port 8502` |
 | NLTK Data Missing | Run `python -m nltk.downloader punkt stopwords` |
 
+
+
 ---
 
 ## 📊 Dataset
@@ -241,6 +285,96 @@ Compute cosine similarity matrix (4806 × 4806)
 Save model (movie_list.pkl, similarity.pkl)
 ```
 
+
+---
+
+## 🧠 Model Training
+
+The recommendation model is trained using a content-based filtering approach. Here's how it works:
+
+### Training Process
+
+**1. Data Collection & Preprocessing**
+```python
+# Load datasets
+movies = pd.read_csv('Dataset/tmdb_5000_movies.csv')
+credits = pd.read_csv('Dataset/tmdb_5000_credits.csv')
+
+# Merge on title
+movies = movies.merge(credits, on='title')
+
+# Extract relevant features
+movies = movies[['movie_id', 'title', 'overview', 'genres', 'keywords', 'cast', 'crew']]
+```
+
+**2. Feature Engineering**
+```python
+# Extract top 3 cast members
+def convert_cast(text):
+    return [actor['name'] for actor in ast.literal_eval(text)[:3]]
+
+# Extract director from crew
+def fetch_director(text):
+    for person in ast.literal_eval(text):
+        if person['job'] == 'Director':
+            return [person['name']]
+    return []
+
+# Apply transformations
+movies['cast'] = movies['cast'].apply(convert_cast)
+movies['crew'] = movies['crew'].apply(fetch_director)
+movies['genres'] = movies['genres'].apply(lambda x: [genre['name'] for genre in ast.literal_eval(x)])
+movies['keywords'] = movies['keywords'].apply(lambda x: [kw['name'] for kw in ast.literal_eval(x)])
+```
+
+**3. Text Processing**
+```python
+# Combine all features into tags
+movies['tags'] = movies['overview'] + movies['genres'] + movies['keywords'] + movies['cast'] + movies['crew']
+
+# Convert to string and lowercase
+movies['tags'] = movies['tags'].apply(lambda x: ' '.join(x).lower())
+
+# Apply stemming
+from nltk.stem import PorterStemmer
+ps = PorterStemmer()
+movies['tags'] = movies['tags'].apply(lambda x: ' '.join([ps.stem(word) for word in x.split()]))
+```
+
+**4. Vectorization & Similarity Computation**
+```python
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+# Create count vectorizer
+cv = CountVectorizer(max_features=5000, stop_words='english')
+vectors = cv.fit_transform(movies['tags']).toarray()
+
+# Compute cosine similarity matrix
+similarity = cosine_similarity(vectors)
+
+# Save models
+pickle.dump(movies, open('model_files/movie_list.pkl', 'wb'))
+pickle.dump(similarity, open('model_files/similarity.pkl', 'wb'))
+```
+
+### Model Parameters
+
+| Parameter | Value | Description |
+|-----------|-------|-------------|
+| `max_features` | 5000 | Maximum vocabulary size for CountVectorizer |
+| `stop_words` | 'english' | Remove common English words |
+| `similarity_metric` | Cosine Similarity | Measure of similarity between vectors |
+| `top_n_recommendations` | 5 | Number of recommendations to return |
+
+### Training Environment
+
+- **Notebook:** `Movie Recommender System.ipynb`
+- **Training Time:** ~2 minutes (on standard CPU)
+- **Model Size:** 184 MB (similarity matrix)
+- **Libraries:** scikit-learn, NLTK, Pandas, NumPy
+
+
 ---
 
 ## 📁 Project Structure
@@ -266,6 +400,7 @@ Movie-Recommender-System/
     └── secrets.toml               # TMDB API key
 ```
 
+
 ---
 
 ## 📈 Performance
@@ -286,6 +421,7 @@ Movie-Recommender-System/
 - **Recommendation Generation:** ~0.8s
 - **Memory Usage:** ~500MB
 - **Concurrent Users:** 100+
+
 
 ---
 
@@ -322,6 +458,180 @@ print(recommend('Avatar'))
 # Output: ['Guardians of the Galaxy', 'Star Wars', 'Star Trek', ...]
 ```
 
+
+---
+
+## 📚 API Reference
+
+### Core Functions
+
+#### `recommend(movie_title: str) -> list`
+
+Returns top 5 similar movies based on content similarity.
+
+**Parameters:**
+- `movie_title` (str): Title of the movie (must exist in dataset)
+
+**Returns:**
+- List of dictionaries containing recommended movies with poster URLs and trailers
+
+**Example:**
+```python
+recommendations = recommend('The Dark Knight')
+# Returns: [
+#   {'title': 'The Dark Knight Rises', 'poster': '...', 'trailer': '...'},
+#   {'title': 'Batman Begins', 'poster': '...', 'trailer': '...'},
+#   ...
+# ]
+```
+
+#### `get_movie_details(movie_id: int) -> dict`
+
+Fetches comprehensive movie information from TMDB API.
+
+**Parameters:**
+- `movie_id` (int): TMDB movie ID
+
+**Returns:**
+- Dictionary with rating, cast, crew, budget, revenue, genres, etc.
+
+**Example:**
+```python
+details = get_movie_details(19995)  # Avatar
+# Returns: {
+#   'rating': 7.2,
+#   'cast': [...],
+#   'director': 'James Cameron',
+#   'budget': '$237,000,000',
+#   ...
+# }
+```
+
+#### `get_trending_movies() -> list`
+
+Gets current trending movies from TMDB API.
+
+**Returns:**
+- List of top 5 trending movies with posters and IDs
+
+#### `fetch_poster(movie_id: int) -> str`
+
+Fetches movie poster URL from TMDB API.
+
+**Parameters:**
+- `movie_id` (int): TMDB movie ID
+
+**Returns:**
+- Full URL to movie poster (500px width)
+
+#### `fetch_trailer(movie_id: int) -> str`
+
+Fetches YouTube trailer URL from TMDB API.
+
+**Parameters:**
+- `movie_id` (int): TMDB movie ID
+
+**Returns:**
+- YouTube URL to official trailer (if available)
+
+### Configuration
+
+**Environment Variables:**
+```python
+TMDB_API_KEY = st.secrets["tmdb"]["api_key"]  # From .streamlit/secrets.toml
+```
+
+**Session State:**
+```python
+st.session_state.history        # Recently viewed movies (list of IDs)
+st.session_state.mode           # Current mode: 'search' or 'surprise'
+st.session_state.selected_movie # Currently selected movie title
+```
+
+
+---
+
+## ❓ FAQ
+
+<details>
+<summary><b>How does the recommendation system work?</b></summary>
+<br>
+It uses content-based filtering with cosine similarity. Movies are represented as vectors based on genres, cast, crew, keywords, and plot. Similar movies have vectors close together in this multi-dimensional space.
+</details>
+
+<details>
+<summary><b>How many movies are in the database?</b></summary>
+<br>
+4,806 movies from the TMDb 5000 dataset, spanning 1916-2017.
+</details>
+
+<details>
+<summary><b>Can I add my own movies?</b></summary>
+<br>
+Not directly. You would need to retrain the model with new data. See the Jupyter notebook for the training process.
+</details>
+
+<details>
+<summary><b>Why do I need a TMDB API key?</b></summary>
+<br>
+The API key is required to fetch real-time data like posters, trailers, cast information, and ratings from The Movie Database.
+</details>
+
+<details>
+<summary><b>What algorithm is used for recommendations?</b></summary>
+<br>
+Content-based filtering using CountVectorizer for text features and cosine similarity for computing movie similarity scores.
+</details>
+
+<details>
+<summary><b>How accurate are the recommendations?</b></summary>
+<br>
+Accuracy depends on user preference, but the system achieves good results by considering multiple features (genres, cast, crew, plot, keywords).
+</details>
+
+<details>
+<summary><b>Can this handle collaborative filtering?</b></summary>
+<br>
+No, this is purely content-based. It doesn't use user ratings or behavior data.
+</details>
+
+<details>
+<summary><b>What if a movie title has special characters?</b></summary>
+<br>
+Use the exact title as it appears in the dropdown menu. The system is case-sensitive.
+</details>
+
+<details>
+<summary><b>How often is the trending section updated?</b></summary>
+<br>
+Trending movies are fetched in real-time from TMDB API every time you load the page.
+</details>
+
+<details>
+<summary><b>Can I deploy this on my own server?</b></summary>
+<br>
+Yes! It works on any platform that supports Streamlit (Streamlit Cloud, Heroku, AWS, etc.).
+</details>
+
+<details>
+<summary><b>What are the system requirements?</b></summary>
+<br>
+Python 3.8+, ~500MB RAM, and the libraries in `requirements.txt`.
+</details>
+
+<details>
+<summary><b>How do I update the movie database?</b></summary>
+<br>
+Download a new dataset, retrain the model using the Jupyter notebook, and replace the `.pkl` files.
+</details>
+
+<details>
+<summary><b>Is there a rate limit on TMDB API?</b></summary>
+<br>
+Yes, TMDB has rate limits. The app uses retry logic with exponential backoff to handle this gracefully.
+</details>
+
+
 ---
 
 ## 🤝 Contributing
@@ -334,23 +644,30 @@ Contributions are welcome! Here's how:
 4. Push to branch (`git push origin feature/YourFeature`)
 5. Open a Pull Request
 
+
 ---
 
 ## 📝 License
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
+
 ---
 
-## 📧 Contact
+## 📬 Contact
 
-**Harshal Kumawat**
+<div align="center">
 
-[![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github)](https://github.com/hk-kumawat)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=flat&logo=linkedin)](https://www.linkedin.com/in/harshal-kumawat/)
-[![Email](https://img.shields.io/badge/Email-D14836?style=flat&logo=gmail&logoColor=white)](mailto:harshalkumawat100@gmail.com)
+### Get in Touch!
 
-**Project Link:** [github.com/hk-kumawat/Movie-Recommender-System](https://github.com/hk-kumawat/Movie-Recommender-System)
+Feel free to reach out for collaborations, questions, or feedback:
+
+[![GitHub](https://img.shields.io/badge/GitHub-hk--kumawat-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/hk-kumawat)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Harshal%20Kumawat-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/harshal-kumawat/)
+[![Email](https://img.shields.io/badge/Email-harshalkumawat100@gmail.com-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:harshalkumawat100@gmail.com)
+
+</div>
+
 
 ---
 
